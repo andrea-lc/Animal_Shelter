@@ -1,0 +1,12 @@
+45967660,Fabricio,Calderon,934212455,fabri@gmail.com,Miercoles (Diurno): 10:00 - 12:00
+12345678,Elena,Moreno,978901234,elena.moreno@gmail.com,Viernes (Diurno): 8:00 - 10:00
+12345679,David,Suarez,989012345,david.suarez@gmail.com,Jueves (Tarde): 15:00 - 17:00
+12345676,Sofia,Diaz,923456789,sofia.diaz@gmail.com,Lunes (Diurno): 9:00 - 11:00
+12345677,Javier,Ruiz,967890123,javier.ruiz@gmail.com,Martes (Tarde): 13:00 - 15:00
+12345674,Laura,Gonzalez,945612378,laura.gonzalez@gmail.com,Jueves (Tarde): 15:00 - 17:00
+12345675,Diego,Hernandez,976543210,diego.hernandez@gmail.com,Sabado (Tarde): 16:00 - 18:00
+12345672,Maria,Lopez,934567890,maria.lopez@gmail.com,Viernes (Diurno): 8:00 - 10:00
+12345673,Pedro,Martinez,956781234,pedro.martinez@gmail.com,Martes (Tarde): 13:00 - 15:00
+12345670,Ana,Garcia,987654321,ana.garcia@gmail.com,Lunes (Diurno): 9:00 - 11:00
+12345671,Carlos,Rodriguez,912345678,carlos.rodriguez@gmail.com,Miercoles (Diurno): 10:00 - 12:00
+60783559,Gabriela,Lopez,946414844,gabriella@gmail.com,Lunes (Diurno): 9:00 - 11:00

@@ -1,0 +1,21 @@
+11,Mimi,2,Siames,3.10,Hembra,Si,Adoptado,terapia respiratoria
+12,Salem,4,Bombay,4.40,Macho,Si,En adopcion,masajes relajantes
+13,Kira,3,Angora,3.60,Hembra,No,En adopcion,ninguno
+14,Titan,1,Criollo,3.00,Macho,No,En adopcion,ninguno
+15,Perla,2,Persa,4.20,Hembra,Si,Adoptado,hidroterapia
+16,Rocky,3,Criollo,3.80,Macho,Si,En adopcion,ninguno
+17,Chispa,1,Siames,2.70,Hembra,No,En adopcion,ninguno
+18,Zeus,5,Bengala,5.90,Macho,Si,Adoptado,rehabilitacion cardiaca
+19,Blanca,2,Angora,3.30,Hembra,Sí,En adopcion,ninguno
+1,Kitty,2,Siames,3.40,Hembra,No,Adoptado,fisioterapia
+2,Tom,1,Criollo,2.80,Macho,No,Adoptado,ninguno
+3,Luna,3,Persa,4.10,Hembra,Si,Adoptado,yoga felino
+4,Simba,2,Bengala,3.90,Macho,Si,En adopcion,ejercicios post-quirurgicos
+5,Nala,1,Angora,3.00,Hembra,No,En adopcion,ninguno
+6,Coco,4,Criollo,4.50,Macho,Si,Adoptado,rehabilitacion muscular
+7,Mora,2,Siames,3.20,Hembra,Si,En adopcion,ninguno
+8,Leo,5,Maine Coon,6.20,Macho,Si,En Adopcion,terapia articular
+9,Kiara,1,Criollo,2.90,Hembra,No,En adopcion,ninguno
+20,Rolo,4,Criollo,4.10,Macho,Si,Adoptado,recuperacion neurologica
+10,Felix,3,Bombay,4.00,Macho,Si,Adoptado,ninguno
+21,Berlin,3,Mestizo,3.00,Masculino,Si,En adopcion,Ninguno

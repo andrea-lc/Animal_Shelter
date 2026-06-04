@@ -1,0 +1,8 @@
+60783561,María,Delgado,946414835,maria.delgado@mail.com,Kitty
+60783562,Diego,Moreno,946414836,pedro_delgado@mail.com,Luna
+60783567,Sofía,Garcia,946414841,sofia.delgado@mail.com,Zeus
+60783568,Diego,Suarez,946414842,diego.dg@mail.com,Rolo
+60783566,Ricardo,Delgado,946414840,ricardo.dr@mail.com,Perla
+50634995,Andrea,Lopez,934343444,andreadelr.lc@gmail.com,Felix
+60783565,Laura,Hernandez,946414839,laura.dl@mail.com,Mimi
+
