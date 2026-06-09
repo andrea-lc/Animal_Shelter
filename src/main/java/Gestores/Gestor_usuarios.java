@@ -18,6 +18,11 @@ import java.io.IOException;
  */
 // Clase Gestor_usuarios
 public class Gestor_usuarios extends GestorBase <Administradores>{
+    /**
+     * Idea de cambio:
+     * Colas: Intento de login hasta 5 veces,si falla la cuenta se bloqueara
+     * Pilas: Historial de logins
+     */
 
     private static Gestor_usuarios instancia;
     
@@ -31,7 +36,7 @@ public class Gestor_usuarios extends GestorBase <Administradores>{
         }  
         return instancia; 
     }         
-     
+    
     @Override
     public void cargarDatos() {
         try (BufferedReader br = new BufferedReader(new FileReader(rutaArchivo))) {
