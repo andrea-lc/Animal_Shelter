@@ -111,11 +111,11 @@ public class Gestor_usuarios extends GestorBase<Administradores> {
             return false; // correo (usuario) no encontrado
         }
         Administradores valor = getElementos().get(correo); // devolvera el valor asociado a la clave "correo"
-        historialLogins.push(valor);// Agregar al historial de logins
 
         if (valor != null && valor.getContraseña().equals(contraseña)) {
             System.out.println("Bienvenid@ " + valor.getNombre());
             valor.setFechaUltimoLogin(LocalDateTime.now()); // Actualizar la fecha del ultimo login exitoso
+            historialLogins.push(valor);// Agrega a la pila el administrador que ha iniciado sesión exitosamente
             guardarHistorial(); // Guardar el historial de logins exitoso en el archivo
             return true; // login correcto
         } else {
@@ -124,20 +124,9 @@ public class Gestor_usuarios extends GestorBase<Administradores> {
     }
 
     public void guardarHistorial() {
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter("TXT/HistorialLogins.txt",false))) {
-            for(Administradores admin : historialLogins) {
-                String linea = String.format("%s,%s,%s,%d,%s,%s, %s",
-                        admin.getDni_persona(),
-                        admin.getNombre(),
-                        admin.getApellido(),
-                        admin.getTelefono(),
-                        admin.getCorreo(),
-                        admin.getContraseña(),
-                        admin.getFechaFormateada());
-                bw.write(linea);
-                bw.newLine();
-            }
-            
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter("TXT/HistorialLogins.txt",true))) {
+                bw.write(historialLogins.peek().toString()); //escribe en el archivo el ultimo elemento en la pila
+                bw.newLine();              
         } catch (IOException ex) {
             System.out.println("Error al guardar cambios en el archivo de historial de logins");
         }
