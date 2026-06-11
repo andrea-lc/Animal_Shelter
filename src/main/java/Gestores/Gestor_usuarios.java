@@ -109,36 +109,37 @@ public class Gestor_usuarios extends GestorBase<Administradores> {
         // Verificar si el correo existe en el sistema( en el hashmap)
         if (!getElementos().containsKey(correo)) {
             return false; // correo (usuario) no encontrado
-
         }
         Administradores valor = getElementos().get(correo); // devolvera el valor asociado a la clave "correo"
         historialLogins.push(valor);// Agregar al historial de logins
 
         if (valor != null && valor.getContraseña().equals(contraseña)) {
             System.out.println("Bienvenid@ " + valor.getNombre());
+            valor.setFechaUltimoLogin(LocalDateTime.now()); // Actualizar la fecha del ultimo login exitoso
             guardarHistorial(); // Guardar el historial de logins exitoso en el archivo
             return true; // login correcto
         } else {
-            return false; // contraseña incorrecta
+            return false; // contraseña incorrecta o usuario no encontrado
         }
     }
 
     public void guardarHistorial() {
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter("TXT/HistorialLogins.txt"))) {
-            for (Administradores admin : historialLogins) {
-                String linea = String.format("%d,%s,%s,%d,%s,%s,%s",
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter("TXT/HistorialLogins.txt",false))) {
+            for(Administradores admin : historialLogins) {
+                String linea = String.format("%s,%s,%s,%d,%s,%s, %s",
                         admin.getDni_persona(),
                         admin.getNombre(),
                         admin.getApellido(),
                         admin.getTelefono(),
                         admin.getCorreo(),
                         admin.getContraseña(),
-                    );
+                        admin.getFechaFormateada());
                 bw.write(linea);
                 bw.newLine();
             }
+            
         } catch (IOException ex) {
-            System.out.println("Error al guardar cambios en el archivo de admiistradores");
+            System.out.println("Error al guardar cambios en el archivo de historial de logins");
         }
     }
 
