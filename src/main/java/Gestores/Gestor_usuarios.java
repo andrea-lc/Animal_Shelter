@@ -12,6 +12,10 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Queue;
 import java.util.Stack;
 
 /**
@@ -23,13 +27,19 @@ public class Gestor_usuarios extends GestorBase<Administradores> {
     /**
      * Idea de cambio:
      * Colas: Intento de login hasta 5 veces,si falla la cuenta se bloqueara
+     * Si se usa una cola, el intento mas antiguio osea el primero que entro
+     * sera el primero en salir para darle lugar a un intento nuevo.
      * Pilas: Historial de logins
+     * Si un administrador inicia sesion, ese es el evento mas reciente.
+     * Al usar una pila, cuando quieras mostrar el historial, el ultimo
+     * login estara hasta arriba, osea el mas facil de encontrar con peek()
      */
 
     private static Gestor_usuarios instancia;
 
     // Pila para el historial de loggins
     private Stack<Administradores> historialLogins = new Stack<>();
+    private Map<Administradores, Queue<Administradores>> intentosFallidosPorUsuario = new HashMap<>();
 
     public Gestor_usuarios() {
         super("TXT/Administradores.txt");
@@ -110,6 +120,12 @@ public class Gestor_usuarios extends GestorBase<Administradores> {
         if (!getElementos().containsKey(correo)) {
             return false; // correo (usuario) no encontrado
         }
+
+        if(getElementos().get(correo).isBloqueado()) { // Verificar si la cuenta del usuario esta bloqueada
+            System.out.println("La cuenta de " + getElementos().get(correo).getNombre() + " esta bloqueada. Pruebe denuevo en 5 minutos.");
+            return false; // Si la cuenta esta bloqueada, no se permite el login
+        }
+
         Administradores valor = getElementos().get(correo); // devolvera el valor asociado a la clave "correo"
 
         if (valor != null && valor.getContraseña().equals(contraseña)) {
@@ -119,16 +135,49 @@ public class Gestor_usuarios extends GestorBase<Administradores> {
             guardarHistorial(); // Guardar el historial de logins exitoso en el archivo
             return true; // login correcto
         } else {
+            IntentosLoginFallidos(valor); // Llama al metodo para manejar los intentos de login fallidos
             return false; // contraseña incorrecta o usuario no encontrado
         }
     }
 
-    public void guardarHistorial() {
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter("TXT/HistorialLogins.txt",true))) {
-                bw.write(historialLogins.peek().toString()); //escribe en el archivo el ultimo elemento en la pila
-                bw.newLine();              
+    // Metodo para guardar el historial de logins exitosos en un archivo de texto
+    // (PILAS)
+    private void guardarHistorial() {
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter("TXT/HistorialLogins.txt", true))) {
+            bw.write(historialLogins.peek().toString()); // escribe en el archivo el ultimo elemento en la pila
+            bw.newLine();
         } catch (IOException ex) {
             System.out.println("Error al guardar cambios en el archivo de historial de logins");
+        }
+    }
+
+    private void IntentosLoginFallidos(Administradores valor) {
+        LocalDateTime horabloqueada;
+        LocalDateTime horadesbloqueo = null;
+        //Verificar si el usuario ya tiene una cola de intentos fallidos 
+        intentosFallidosPorUsuario.putIfAbsent(valor, new LinkedList<>());
+        Queue<Administradores> intentosFallidos = intentosFallidosPorUsuario.get(valor);
+        
+        intentosFallidos.add(valor); // Agrega un intento fallido a la cola del usuario
+        if (intentosFallidos.size() >= 2) { // Si el usuario ha tenido 2 intentos fallidos
+            valor.setBloqueado(true); // Bloquea la cuenta del usuario
+            System.out.println("La cuenta de " + valor.getNombre() + " ha sido bloqueada debido a multiples intentos fallidos de inicio de sesion.");
+            System.out.println("Pruebe denuevo en 5 minutos.");
+            horabloqueada = LocalDateTime.now();
+            horadesbloqueo = horabloqueada.plusSeconds(10);
+        }else{
+            return; // Si el usuario no ha alcanzado el limite de intentos fallidos, simplemente retorna
+        }
+
+        if (valor.isBloqueado()) {
+            if(LocalDateTime.now().isAfter(horadesbloqueo)) { // Si han pasado 5 minutos desde que se bloqueó la cuenta
+                valor.setBloqueado(false); // Desbloquea la cuenta del usuario
+                intentosFallidos.clear(); // Limpia la cola de intentos fallidos para ese usuario
+                System.out.println("La cuenta de " + valor.getNombre() + " ha sido desbloqueada. Puede intentar iniciar sesion nuevamente.");
+            }else{
+                return; // Si la cuenta sigue bloqueada, simplemente retorna
+            }
+            
         }
     }
 

@@ -12,17 +12,18 @@ import java.time.format.DateTimeFormatter;
  * @author admin
  */
 public class Administradores extends Persona {
-    public String contraseña;
-    public LocalDateTime fechaUltimoLogin;
+    private String contraseña;
+    private LocalDateTime fechaUltimoLogin;
+    private boolean bloqueado; // Nuevo atributo para indicar si la cuenta está bloqueada
 
     public Administradores() {
     }
 
-
-    public Administradores(Persona otraPersona,String contraseña) {
+    public Administradores(Persona otraPersona, String contraseña) {
         super(otraPersona);
-        this.contraseña= contraseña;
-        this.fechaUltimoLogin = null; 
+        this.contraseña = contraseña;
+        this.fechaUltimoLogin = null;
+        this.bloqueado = false; // Inicialmente la cuenta no esta bloqueada
     }
 
     public String getContraseña() {
@@ -33,30 +34,34 @@ public class Administradores extends Persona {
         this.contraseña = contraseña;
     }
 
-
     public LocalDateTime getFechaUltimoLogin() {
         return fechaUltimoLogin;
     }
 
-
     public void setFechaUltimoLogin(LocalDateTime fechaUltimoLogin) {
         this.fechaUltimoLogin = fechaUltimoLogin;
     }
-    
+
+    public boolean isBloqueado() {
+        return bloqueado;
+    }
+
+    public void setBloqueado(boolean bloqueado) {
+        this.bloqueado = bloqueado;
+    }
+
     public String getFechaFormateada() {
         if (this.fechaUltimoLogin == null) {
-            return "Sin registrar"; 
+            return "Sin registrar";
         }
-        
+
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
         return this.fechaUltimoLogin.format(formatter);
     }
-
 
     @Override
     public String toString() {
         return super.toString() + String.format("  Ultimo Login: %s", getFechaFormateada());
     }
 
-    
 }

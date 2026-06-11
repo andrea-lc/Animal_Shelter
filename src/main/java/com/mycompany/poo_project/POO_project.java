@@ -43,12 +43,12 @@ public class POO_project {
                         if (usuarios.login(correo, contraseña)) {
                             menu.MainMenu();
                             break;
-                        }
-
-                        System.out.println("Credenciales incorrectas");
-                        System.out.print("Reintentar? (si/no): ");
-                        if (lector.LeerString().equalsIgnoreCase("no")) {
-                            break;
+                        }else {
+                            System.out.println("Credenciales incorrectas");
+                            System.out.print("Reintentar? (si/no): ");
+                            if (lector.LeerString().equalsIgnoreCase("no")) {
+                                return;
+                            }
                         }
                     }
                     break;
