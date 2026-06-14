@@ -4,8 +4,6 @@
  */
 package Gestores;
 
-import Entidades.Administradores;
-import Entidades.Persona;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileReader;
@@ -17,6 +15,9 @@ import java.util.LinkedList;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Stack;
+
+import Entidades.Administradores;
+import Entidades.Persona;
 
 /**
  *
@@ -38,7 +39,7 @@ public class Gestor_usuarios extends GestorBase<Administradores> {
     private static Gestor_usuarios instancia;
 
     // Pila para el historial de loggins
-    private Stack<Administradores> historialLogins = new Stack<>();
+    private  Stack<Administradores> historialLogins = new Stack<>();
     private Map<Administradores, Queue<Administradores>> intentosFallidosPorUsuario = new HashMap<>();
 
     public Gestor_usuarios() {
@@ -126,6 +127,8 @@ public class Gestor_usuarios extends GestorBase<Administradores> {
             return false; // Si la cuenta esta bloqueada, no se permite el login
         }
 
+        usuarioBloquados();
+
         Administradores valor = getElementos().get(correo); // devolvera el valor asociado a la clave "correo"
 
         if (valor != null && valor.getContraseña().equals(contraseña)) {
@@ -153,33 +156,43 @@ public class Gestor_usuarios extends GestorBase<Administradores> {
 
     private void IntentosLoginFallidos(Administradores valor) {
         LocalDateTime horabloqueada;
-        LocalDateTime horadesbloqueo = null;
+
         //Verificar si el usuario ya tiene una cola de intentos fallidos 
         intentosFallidosPorUsuario.putIfAbsent(valor, new LinkedList<>());
+        //COLA
         Queue<Administradores> intentosFallidos = intentosFallidosPorUsuario.get(valor);
-        
+
         intentosFallidos.add(valor); // Agrega un intento fallido a la cola del usuario
+              
         if (intentosFallidos.size() >= 2) { // Si el usuario ha tenido 2 intentos fallidos
             valor.setBloqueado(true); // Bloquea la cuenta del usuario
             System.out.println("La cuenta de " + valor.getNombre() + " ha sido bloqueada debido a multiples intentos fallidos de inicio de sesion.");
             System.out.println("Pruebe denuevo en 5 minutos.");
             horabloqueada = LocalDateTime.now();
-            horadesbloqueo = horabloqueada.plusSeconds(10);
-        }else{
-            return; // Si el usuario no ha alcanzado el limite de intentos fallidos, simplemente retorna
-        }
-
-        if (valor.isBloqueado()) {
-            if(LocalDateTime.now().isAfter(horadesbloqueo)) { // Si han pasado 5 minutos desde que se bloqueó la cuenta
-                valor.setBloqueado(false); // Desbloquea la cuenta del usuario
-                intentosFallidos.clear(); // Limpia la cola de intentos fallidos para ese usuario
-                System.out.println("La cuenta de " + valor.getNombre() + " ha sido desbloqueada. Puede intentar iniciar sesion nuevamente.");
+            valor.setHoraDesbloqueo(horabloqueada.plusSeconds(10));
+            if (valor.isBloqueado()==true) {
+                if(LocalDateTime.now().isAfter(valor.getHoraDesbloqueo())) { // Si han pasado 5 minutos desde que se bloqueó la cuenta
+                    valor.setBloqueado(false); // Desbloquea la cuenta del usuario
+                    intentosFallidos.clear(); // Limpia la cola de intentos fallidos para ese usuario
+                    System.out.println("La cuenta de " + valor.getNombre() + " ha sido desbloqueada. Puede intentar iniciar sesion nuevamente.");  
+                }         
             }else{
-                return; // Si la cuenta sigue bloqueada, simplemente retorna
-            }
-            
+                return;
+            }     
         }
     }
+
+    Administradores admin= new Administradores();
+
+    private void usuarioBloquados() {
+        try (BufferedWriter bw = new BufferedWriter(new FileWriter("TXT/UsuariosBloqueados.txt", true))) {
+            bw.write(admin.aTexto()); // escribe en el archivo el ultimo elemento en la pila
+            bw.newLine();
+        } catch (IOException ex) {
+            System.out.println("Error al guardar cambios en el archivo de historial de logins");
+        }
+    }
+    
 
     @Override
     public boolean existe(String identificador) {
@@ -192,6 +205,7 @@ public class Gestor_usuarios extends GestorBase<Administradores> {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from
                                                                        // nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
+//Hola we, como se abre el chat nose
 
     @Override
     public void modificar(String datoModificar, int opcion) {

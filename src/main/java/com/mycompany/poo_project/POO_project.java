@@ -6,8 +6,8 @@ package com.mycompany.poo_project;
 
 import Entidades.Administradores;
 import Entidades.Persona;
+import Gestores.Gestor_usuarios;
 import Menus.Menu;
-import Gestores.*;
 import Scanner.Lector;
 
 /**
@@ -43,11 +43,12 @@ public class POO_project {
                         if (usuarios.login(correo, contraseña)) {
                             menu.MainMenu();
                             break;
-                        }else {
+                        }else{
+                            
                             System.out.println("Credenciales incorrectas");
-                            System.out.print("Reintentar? (si/no): ");
+                            System.out.print("Reintentar? (si/no): ");                          
                             if (lector.LeerString().equalsIgnoreCase("no")) {
-                                return;
+                                break;
                             }
                         }
                     }

@@ -15,6 +15,7 @@ public class Administradores extends Persona {
     private String contraseña;
     private LocalDateTime fechaUltimoLogin;
     private boolean bloqueado; // Nuevo atributo para indicar si la cuenta está bloqueada
+    private LocalDateTime horaDesbloqueo;
 
     public Administradores() {
     }
@@ -42,6 +43,8 @@ public class Administradores extends Persona {
         this.fechaUltimoLogin = fechaUltimoLogin;
     }
 
+    
+
     public boolean isBloqueado() {
         return bloqueado;
     }
@@ -59,9 +62,23 @@ public class Administradores extends Persona {
         return this.fechaUltimoLogin.format(formatter);
     }
 
+
+
     @Override
     public String toString() {
         return super.toString() + String.format("  Ultimo Login: %s", getFechaFormateada());
+    }
+
+    public String aTexto() {
+        return super.toString() + String.format("  Ultimo Login: \n Usuario Bloqueado %s %s ", getFechaFormateada(),isBloqueado());
+    }
+
+    public LocalDateTime getHoraDesbloqueo() {
+        return horaDesbloqueo;
+    }
+
+    public void setHoraDesbloqueo(LocalDateTime horaDesbloqueo) {
+        this.horaDesbloqueo = horaDesbloqueo;
     }
 
 }

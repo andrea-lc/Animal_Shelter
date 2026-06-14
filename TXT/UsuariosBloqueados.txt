@@ -1,0 +1,28 @@
+
+DNI #0
+  Nombre y Apellido: null null
+  Telefono: 0
+  Correo: null 
+  Ultimo Login: 
+ Usuario Bloqueado Sin registrar false 
+
+DNI #0
+  Nombre y Apellido: null null
+  Telefono: 0
+  Correo: null 
+  Ultimo Login: 
+ Usuario Bloqueado Sin registrar false 
+
+DNI #0
+  Nombre y Apellido: null null
+  Telefono: 0
+  Correo: null 
+  Ultimo Login: 
+ Usuario Bloqueado Sin registrar false 
+
+DNI #0
+  Nombre y Apellido: null null
+  Telefono: 0
+  Correo: null 
+  Ultimo Login: 
+ Usuario Bloqueado Sin registrar false 
