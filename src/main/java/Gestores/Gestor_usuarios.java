@@ -39,7 +39,7 @@ public class Gestor_usuarios extends GestorBase<Administradores> {
     private static Gestor_usuarios instancia;
 
     // Pila para el historial de loggins
-    private  Stack<Administradores> historialLogins = new Stack<>();
+    private Stack<Administradores> historialLogins = new Stack<>();
     private Map<Administradores, Queue<Administradores>> intentosFallidosPorUsuario = new HashMap<>();
 
     public Gestor_usuarios() {
@@ -122,24 +122,36 @@ public class Gestor_usuarios extends GestorBase<Administradores> {
             return false; // correo (usuario) no encontrado
         }
 
-        if(getElementos().get(correo).isBloqueado()) { // Verificar si la cuenta del usuario esta bloqueada
-            System.out.println("La cuenta de " + getElementos().get(correo).getNombre() + " esta bloqueada. Pruebe denuevo en 5 minutos.");
-            return false; // Si la cuenta esta bloqueada, no se permite el login
-        }
-
-        usuarioBloquados();
-
         Administradores valor = getElementos().get(correo); // devolvera el valor asociado a la clave "correo"
 
+        if (valor.isBloqueado() && valor.getHoraDesbloqueo() != null
+                && LocalDateTime.now().isAfter(valor.getHoraDesbloqueo())) {
+            valor.setBloqueado(false);
+            valor.setHoraDesbloqueo(null); // Limpiamos la hora para la próxima vez
+
+            // Limpiamos la cola de intentos fallidos para que empiece de cero
+            if (intentosFallidosPorUsuario.containsKey(valor)) {
+                intentosFallidosPorUsuario.get(valor).clear();
+            }
+            System.out.println("La cuenta de " + valor.getNombre() + " ha sido desbloqueada.");
+        }
+
+        // Ahora sí, validamos si sigue bloqueado (por si aún no pasa el tiempo)
+        if (valor.isBloqueado()) {
+            System.out.println("La cuenta de " + valor.getNombre() + " esta bloqueada. Pruebe denuevo más tarde.");
+            return false;
+        }
         if (valor != null && valor.getContraseña().equals(contraseña)) {
             System.out.println("Bienvenid@ " + valor.getNombre());
             valor.setFechaUltimoLogin(LocalDateTime.now()); // Actualizar la fecha del ultimo login exitoso
             historialLogins.push(valor);// Agrega a la pila el administrador que ha iniciado sesión exitosamente
+            intentosFallidosPorUsuario.get(valor).clear(); // Limpiar la cola de intentos fallidos al iniciar sesión exitosamente
             guardarHistorial(); // Guardar el historial de logins exitoso en el archivo
             return true; // login correcto
         } else {
-            IntentosLoginFallidos(valor); // Llama al metodo para manejar los intentos de login fallidos
-            return false; // contraseña incorrecta o usuario no encontrado
+            IntentosLoginFallidos(valor);
+            usuarioBloquados(valor);           
+            return false; // contraseña incorrecta
         }
     }
 
@@ -157,34 +169,27 @@ public class Gestor_usuarios extends GestorBase<Administradores> {
     private void IntentosLoginFallidos(Administradores valor) {
         LocalDateTime horabloqueada;
 
-        //Verificar si el usuario ya tiene una cola de intentos fallidos 
+        // Verificar si el usuario ya tiene una cola de intentos fallidos
         intentosFallidosPorUsuario.putIfAbsent(valor, new LinkedList<>());
-        //COLA
+        // COLA
         Queue<Administradores> intentosFallidos = intentosFallidosPorUsuario.get(valor);
 
         intentosFallidos.add(valor); // Agrega un intento fallido a la cola del usuario
-              
+
         if (intentosFallidos.size() >= 2) { // Si el usuario ha tenido 2 intentos fallidos
             valor.setBloqueado(true); // Bloquea la cuenta del usuario
-            System.out.println("La cuenta de " + valor.getNombre() + " ha sido bloqueada debido a multiples intentos fallidos de inicio de sesion.");
+            System.out.println("La cuenta de " + valor.getNombre()
+                    + " ha sido bloqueada debido a multiples intentos fallidos de inicio de sesion.");
             System.out.println("Pruebe denuevo en 5 minutos.");
             horabloqueada = LocalDateTime.now();
-            valor.setHoraDesbloqueo(horabloqueada.plusSeconds(10));
-            if (valor.isBloqueado()==true) {
-                if(LocalDateTime.now().isAfter(valor.getHoraDesbloqueo())) { // Si han pasado 5 minutos desde que se bloqueó la cuenta
-                    valor.setBloqueado(false); // Desbloquea la cuenta del usuario
-                    intentosFallidos.clear(); // Limpia la cola de intentos fallidos para ese usuario
-                    System.out.println("La cuenta de " + valor.getNombre() + " ha sido desbloqueada. Puede intentar iniciar sesion nuevamente.");  
-                }         
-            }else{
-                return;
-            }     
+            valor.setHoraDesbloqueo(horabloqueada.plusSeconds(20));          
+        } else {
+            return;
         }
+
     }
 
-    Administradores admin= new Administradores();
-
-    private void usuarioBloquados() {
+    private void usuarioBloquados(Administradores admin) {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter("TXT/UsuariosBloqueados.txt", true))) {
             bw.write(admin.aTexto()); // escribe en el archivo el ultimo elemento en la pila
             bw.newLine();
@@ -192,7 +197,6 @@ public class Gestor_usuarios extends GestorBase<Administradores> {
             System.out.println("Error al guardar cambios en el archivo de historial de logins");
         }
     }
-    
 
     @Override
     public boolean existe(String identificador) {
@@ -205,7 +209,7 @@ public class Gestor_usuarios extends GestorBase<Administradores> {
         throw new UnsupportedOperationException("Not supported yet."); // Generated from
                                                                        // nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
-//Hola we, como se abre el chat nose
+    // Hola we, como se abre el chat nose
 
     @Override
     public void modificar(String datoModificar, int opcion) {

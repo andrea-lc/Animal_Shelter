@@ -58,3 +58,27 @@ DNI #720
   Telefono: 980
   Correo: admin 
   Ultimo Login: 12/06/2026 21:51:34
+
+DNI #60783559
+  Nombre y Apellido: Andrea Lopez
+  Telefono: 946414833
+  Correo: andreadelr.lc@gmail.com 
+  Ultimo Login: 14/06/2026 19:03:25
+
+DNI #60783559
+  Nombre y Apellido: Andrea Lopez
+  Telefono: 946414833
+  Correo: andreadelr.lc@gmail.com 
+  Ultimo Login: 14/06/2026 20:00:51
+
+DNI #60783559
+  Nombre y Apellido: Andrea Lopez
+  Telefono: 946414833
+  Correo: andreadelr.lc@gmail.com 
+  Ultimo Login: 14/06/2026 20:18:26
+
+DNI #60783559
+  Nombre y Apellido: Andrea Lopez
+  Telefono: 946414833
+  Correo: andreadelr.lc@gmail.com 
+  Ultimo Login: 14/06/2026 20:18:46

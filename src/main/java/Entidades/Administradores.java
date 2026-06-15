@@ -43,8 +43,6 @@ public class Administradores extends Persona {
         this.fechaUltimoLogin = fechaUltimoLogin;
     }
 
-    
-
     public boolean isBloqueado() {
         return bloqueado;
     }
@@ -55,14 +53,11 @@ public class Administradores extends Persona {
 
     public String getFechaFormateada() {
         if (this.fechaUltimoLogin == null) {
-            return "Sin registrar";
+            return "Sin registro";
         }
-
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
-        return this.fechaUltimoLogin.format(formatter);
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm:ss");
+            return this.fechaUltimoLogin.format(formatter);       
     }
-
-
 
     @Override
     public String toString() {
@@ -70,7 +65,8 @@ public class Administradores extends Persona {
     }
 
     public String aTexto() {
-        return super.toString() + String.format("  Ultimo Login: \n Usuario Bloqueado %s %s ", getFechaFormateada(),isBloqueado());
+        return super.toString()
+                + String.format("  Ultimo Login: %s\n  Usuario Bloqueado: %s ", getFechaFormateada(), isBloqueado()? "Usuario Bloqueado" : "El usuario no esta bloqueado");
     }
 
     public LocalDateTime getHoraDesbloqueo() {

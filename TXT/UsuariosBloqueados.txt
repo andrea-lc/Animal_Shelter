@@ -1,28 +1,22 @@
 
-DNI #0
-  Nombre y Apellido: null null
-  Telefono: 0
-  Correo: null 
-  Ultimo Login: 
- Usuario Bloqueado Sin registrar false 
 
-DNI #0
-  Nombre y Apellido: null null
-  Telefono: 0
-  Correo: null 
-  Ultimo Login: 
- Usuario Bloqueado Sin registrar false 
+DNI #60783559
+  Nombre y Apellido: Andrea Lopez
+  Telefono: 946414833
+  Correo: andreadelr.lc@gmail.com 
+  Ultimo Login: Sin registro
+  Usuario Bloqueado: Usuario Bloqueado 
 
-DNI #0
-  Nombre y Apellido: null null
-  Telefono: 0
-  Correo: null 
-  Ultimo Login: 
- Usuario Bloqueado Sin registrar false 
+DNI #60783559
+  Nombre y Apellido: Andrea Lopez
+  Telefono: 946414833
+  Correo: andreadelr.lc@gmail.com 
+  Ultimo Login: 14/06/2026 20:18:26
+  Usuario Bloqueado: El usuario no esta bloqueado 
 
-DNI #0
-  Nombre y Apellido: null null
-  Telefono: 0
-  Correo: null 
-  Ultimo Login: 
- Usuario Bloqueado Sin registrar false 
+DNI #60783559
+  Nombre y Apellido: Andrea Lopez
+  Telefono: 946414833
+  Correo: andreadelr.lc@gmail.com 
+  Ultimo Login: 14/06/2026 20:18:46
+  Usuario Bloqueado: Usuario Bloqueado 
