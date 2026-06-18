@@ -5,7 +5,6 @@
 package EstructurasDeDatos;
 
 import Entidades.Adoptantes;
-import java.util.List;
 
 /**
  *
@@ -14,11 +13,11 @@ import java.util.List;
 public class ListaEnlazadaSimple {
     
     // Clase Nodo interna
-    private static class Nodo {
-        Adoptantes adoptante;
-        Nodo siguiente;
+    public static class Nodo {
+        public Adoptantes adoptante;
+        public Nodo siguiente;
         
-        Nodo(Adoptantes adoptante) {
+        public Nodo(Adoptantes adoptante) {
             this.adoptante = adoptante;
             this.siguiente = null;
         }
@@ -32,52 +31,27 @@ public class ListaEnlazadaSimple {
         this.tamaño = 0;
     }
     
-    /**
-     * CARGA DATOS DESDE TU GESTOR EXISTENTE
-     * Toma todos los adoptantes que ya tienes guardados y los inserta uno por uno al final de esta lista enlazada.
-     */
-    public void cargarDesdeLista(List<Adoptantes> listaAdoptantes) {
-        for (Adoptantes adoptante : listaAdoptantes) {
-            insertarAlFinal(adoptante);// Inserta cada adoptante al final
-        }
-    }
+    // ===== MÉTODOS PRINCIPALES =====
     
-    /**
-     * INSERCION AL INICIO (O(1))
-     */
-    public void insertarAlInicio(Adoptantes adoptante) {
-        Nodo nuevo = new Nodo(adoptante); // PASO 1: Crear nuevo nodo
-        nuevo.siguiente = cabeza;// PASO 2: Nuevo nodo apunta a la antigua cabeza
-        cabeza = nuevo;// PASO 3: La cabeza ahora es el nuevo nodo
-        tamaño++;// PASO 4: Incrementar tamaño
-    }
-    
-    /**
-     * INSERCION AL FINAL (O(n))
-     */
+    // Insertar al final (O(n))
     public void insertarAlFinal(Adoptantes adoptante) {
-        Nodo nuevo = new Nodo(adoptante);// PASO 1: Crear nuevo nodo
-        
-        if (cabeza == null) { // PASO 2: ¿Lista vacía?
-            cabeza = nuevo; //   Sí: el nuevo es el primer y único nodo
+        Nodo nuevo = new Nodo(adoptante);
+        if (cabeza == null) {
+            cabeza = nuevo;
         } else {
-            Nodo actual = cabeza;// PASO 3: Empezar desde la cabeza
-            // Recorrer hasta encontrar el último nodo (el que tiene siguiente = null)
+            Nodo actual = cabeza;
             while (actual.siguiente != null) {
-                actual = actual.siguiente;// Avanzar al siguiente nodo
+                actual = actual.siguiente;
             }
-            actual.siguiente = nuevo; // PASO 4: El último nodo apunta al nuevo
+            actual.siguiente = nuevo;
         }
-        tamaño++; // PASO 5: Incrementar tamaño
+        tamaño++;
     }
     
-    /**
-     * INSERCION ORDENADA POR NOMBRE
-     */
+    // Insertar ordenado por nombre (O(n))
     public void insertarOrdenado(Adoptantes adoptante) {
         Nodo nuevo = new Nodo(adoptante);
         
-        // Si la lista está vacía o el nuevo va al inicio
         if (cabeza == null || 
             adoptante.getNombre().compareTo(cabeza.adoptante.getNombre()) < 0) {
             nuevo.siguiente = cabeza;
@@ -92,27 +66,43 @@ public class ListaEnlazadaSimple {
             actual.siguiente = nuevo;
         }
         tamaño++;
-        System.out.println("Adoptante insertado ordenadamente: " + adoptante.getNombre());
     }
     
-    /**
-     * ELIMINACION POR DNI
-     */
-    public boolean eliminar(int dni) {
-        if (cabeza == null) {
-            System.out.println("Lista vacia");
-            return false;
+    // Buscar por DNI (O(n))
+    public Adoptantes buscarPorDNI(int dni) {
+        Nodo actual = cabeza;
+        while (actual != null) {
+            if (actual.adoptante.getDni_persona() == dni) {
+                return actual.adoptante;
+            }
+            actual = actual.siguiente;
         }
+        return null;
+    }
+    
+    // Buscar por nombre (O(n))
+    public Adoptantes buscarPorNombre(String nombre) {
+        Nodo actual = cabeza;
+        while (actual != null) {
+            if (actual.adoptante.getNombre().equalsIgnoreCase(nombre)) {
+                return actual.adoptante;
+            }
+            actual = actual.siguiente;
+        }
+        return null;
+    }
+    
+    // Eliminar por DNI (O(n))
+    public boolean eliminar(int dni) {
+        if (cabeza == null) return false;
         
-        // Si el elemento a eliminar es la cabeza
+        // Si es la cabeza
         if (cabeza.adoptante.getDni_persona() == dni) {
             cabeza = cabeza.siguiente;
             tamaño--;
-            System.out.println("Adoptante eliminado (era la cabeza)");
             return true;
         }
         
-        // Buscar en el resto de la lista
         Nodo actual = cabeza;
         while (actual.siguiente != null && 
                actual.siguiente.adoptante.getDni_persona() != dni) {
@@ -122,83 +112,47 @@ public class ListaEnlazadaSimple {
         if (actual.siguiente != null) {
             actual.siguiente = actual.siguiente.siguiente;
             tamaño--;
-            System.out.println("Adoptante eliminado");
             return true;
         }
-        
-        System.out.println("Adoptante no encontrado");
         return false;
     }
     
-    /**
-     * BUUSQUEDA POR NOMBRE
-     */
-    public Adoptantes buscar(String nombre) {
-        int posicion = 0;
-        Nodo actual = cabeza;
-        
-        while (actual != null) {
-            posicion++;
-            if (actual.adoptante.getNombre().equalsIgnoreCase(nombre)) {
-                System.out.println("Adoptante encontrado en posicion " + posicion);
-                return actual.adoptante;
-            }
-            actual = actual.siguiente;
-        }
-        
-        System.out.println("Adoptante no encontrado");
-        return null;
-    }
-    
-    /**
-     * RECORRIDO COMPLETO (MOSTRAR LISTA)
-     */
+    // Mostrar todos los elementos
     public void mostrar() {
         if (cabeza == null) {
-            System.out.println("Lista enlazada simple vacia");
+            System.out.println("Lista vacía");
             return;
         }
         
-        System.out.println("\n=== LISTA ENLAZADA SIMPLE DE ADOPTANTES ===");
+        System.out.println("\n=== LISTA ENLAZADA SIMPLE ===");
         System.out.println("Total: " + tamaño + " adoptantes");
-        System.out.println("Recorrido: CABEZA → NODOS → FINAL");
         System.out.println("-----------------------------------");
         
         Nodo actual = cabeza;
-        int posicion = 1;
+        int pos = 1;
         while (actual != null) {
-            System.out.println(posicion++ + ". " + actual.adoptante.getNombre() + 
+            System.out.println(pos++ + ". " + actual.adoptante.getNombre() +
                              " (DNI: " + actual.adoptante.getDni_persona() + 
-                             ") → Gato: " + actual.adoptante.getGato_Adoptado());
-            actual = actual.siguiente;
+                             ") -> Gato: " + actual.adoptante.getGato_Adoptado());
+            actual = actual.siguiente;//Avanza al siguiente
         }
         System.out.println("-----------------------------------");
-        System.out.println("null (fin de la lista)");
+        System.out.println("null (fin de la lista)"); //EVIDENCIA: El último apunta a null
     }
     
-    /**
-     * OBTENER ELEMENTO EN POSICION ESPECIFICA
-     */
-    public Adoptantes obtenerPosicion(int posicion) {
-        if (posicion < 1 || posicion > tamaño) {
-            System.out.println("Posicion invalida");
-            return null;
-        }
-        
+    // Obtener todos los elementos como lista (para XML/BD)
+    public java.util.List<Adoptantes> obtenerTodos() {
+        java.util.List<Adoptantes> lista = new java.util.ArrayList<>();
         Nodo actual = cabeza;
-        for (int i = 1; i < posicion; i++) {
+        while (actual != null) {
+            lista.add(actual.adoptante);
             actual = actual.siguiente;
         }
-        
-        System.out.println("En posicion " + posicion + ": " + actual.adoptante.getNombre());
-        return actual.adoptante;
+        return lista;
     }
     
-    public int getTamaño() {
-        return tamaño;
-    }
-    
-    public boolean estaVacia() {
-        return cabeza == null;
-    }
+    // Getters
+    public Nodo getCabeza() { return cabeza; }
+    public int getTamaño() { return tamaño; }
+    public boolean estaVacia() { return cabeza == null; }
 }

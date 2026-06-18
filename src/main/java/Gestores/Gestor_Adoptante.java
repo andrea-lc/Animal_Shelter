@@ -6,37 +6,44 @@ package Gestores;
 
 import Entidades.Adoptantes;
 import Entidades.Persona;
+import EstructurasDeDatos.ListaEnlazadaSimple;
 import Scanner.Lector;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Consumer;
 
 /**
  *
  * @author admin
  */
 public class Gestor_Adoptante extends GestorBase<Adoptantes>{
-    Lector lector=Lector.getInstanciaLector();
-    private static Gestor_Adoptante instancia; 
+     Lector lector = Lector.getInstanciaLector();
+    private static Gestor_Adoptante instancia;
+    
+    //CAMBIO: Ahora usa ListaEnlazadaSimple en lugar de HashMap
+    private ListaEnlazadaSimple listaAdoptantes;
 
     public Gestor_Adoptante() {
         super("TXT/Adoptantes.txt");
+        this.listaAdoptantes = new ListaEnlazadaSimple();
+        cargarDatos();
     }
       
     public static Gestor_Adoptante getInstanciaAdoptantes() {
-        if (instancia== null){
-            instancia= new Gestor_Adoptante();
+        if (instancia == null) {
+            instancia = new Gestor_Adoptante();
         }
         return instancia;
     }
  
     @Override
     public void cargarDatos() {
+        // Limpiar la lista
+        listaAdoptantes = new ListaEnlazadaSimple();
+        
         try (BufferedReader br = new BufferedReader(new FileReader(rutaArchivo))) {
             String linea;
             while ((linea = br.readLine()) != null) {
@@ -44,14 +51,18 @@ public class Gestor_Adoptante extends GestorBase<Adoptantes>{
                 if (datos.length == 6) {
                     int dni = Integer.parseInt(datos[0]);
                     String nombre = datos[1];
-                    String apellido= datos[2];
+                    String apellido = datos[2];
                     int telefono = Integer.parseInt(datos[3]);
                     String correo = datos[4];
                     String gato_Adoptado = datos[5];
-                    Adoptantes adoptante= new Adoptantes(new Persona(dni,nombre,apellido,telefono,correo),
-                            gato_Adoptado);
                     
-                    getElementos().put((String.valueOf(dni)),adoptante);
+                    Adoptantes adoptante = new Adoptantes(
+                        new Persona(dni, nombre, apellido, telefono, correo),
+                        gato_Adoptado
+                    );
+                    
+                    // Insertar en la lista enlazada
+                    listaAdoptantes.insertarOrdenado(adoptante);
                 }
             }
         } catch (IOException e) {
@@ -62,14 +73,18 @@ public class Gestor_Adoptante extends GestorBase<Adoptantes>{
     @Override
     public void guardarCambios() {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(rutaArchivo))) {
-            for (Adoptantes adoptante : getElementos().values()) {
+            // Obtener todos los adoptantes de la lista enlazada
+            List<Adoptantes> todos = listaAdoptantes.obtenerTodos();
+            
+            for (Adoptantes adoptante : todos) {
                 String linea = String.format("%d,%s,%s,%d,%s,%s",
                     adoptante.getDni_persona(),
                     adoptante.getNombre(),
                     adoptante.getApellido(),
                     adoptante.getTelefono(),
                     adoptante.getCorreo(),
-                    adoptante.getGato_Adoptado());
+                    adoptante.getGato_Adoptado()
+                );
                 bw.write(linea);
                 bw.newLine();
             }
@@ -80,78 +95,105 @@ public class Gestor_Adoptante extends GestorBase<Adoptantes>{
 
     @Override
     public boolean registrar(Adoptantes adoptante) { 
-        if (getElementos().containsKey(String.valueOf(adoptante.getDni_persona()))) {
+        // Verificar si ya existe por DNI
+        if (listaAdoptantes.buscarPorDNI(adoptante.getDni_persona()) != null) {
             System.out.println("Este DNI ya esta registrado como adoptante");
             return false;
         }  
 
-        getElementos().put((String.valueOf(adoptante.getDni_persona())), adoptante);
+        // Insertar en la lista enlazada
+        listaAdoptantes.insertarOrdenado(adoptante);
         guardarCambios();
         return true;     
     }
 
     @Override
     public boolean existe(String identificador) {
-        boolean resultado=false;
-        Adoptantes adoptante= retornarElemento(identificador);
-            if (adoptante!=null){
-                resultado= true;
-            }                   
-            return resultado;
+        return retornarElemento(identificador) != null;
     }
 
     @Override
     public void mostrar() {
-        if (getElementos().isEmpty()) {
-            System.out.println("No hay adoptantes registrados en el sistema");
-            return;
-        }        
-        System.out.println("\n=== LISTA DE ADOPTANTES REGISTRADOS ===");
-        System.out.println("Total de adoptantes: " + getElementos().size());
-        System.out.println("-----------------------------------");        
-        getElementos_listaporNombre().forEach(System.out::println);      
+        listaAdoptantes.mostrar();
     }
 
     @Override
     public void modificar(String datoModificar, int opcion) {
         Adoptantes adoptante = retornarElemento(datoModificar);
-        Consumer <Adoptantes> [] modificador= new Consumer[3];
-        if (adoptante != null){
-            modificador[1]= (a) ->{ System.out.print("Nuevo telefono: "); 
-                                    a.setTelefono(lector.LeerEntero());};
-            modificador[2]= (a)->{ System.out.print("Nuevo correo: ");
-                                    a.setCorreo(lector.LeerString());};        
-            }  
-        modificador[opcion].accept(adoptante);
+        if (adoptante == null) {
+            System.out.println("Adoptante no encontrado");
+            return;
+        }
+
+        switch (opcion) {
+            case 1:
+                System.out.print("Nuevo telefono: ");
+                adoptante.setTelefono(lector.LeerEntero());
+                break;
+            case 2:
+                System.out.print("Nuevo correo: ");
+                adoptante.setCorreo(lector.LeerString());
+                break;
+            default:
+                System.out.println("Opción inválida");
+                return;
+        }
+
         guardarCambios();
-    } 
+        System.out.println("Datos modificados exitosamente");
+    }
         
     @Override
     public void buscar(String identificador) {
-        List<Adoptantes> resultados=new ArrayList<>();
-        // Buscar por DNI (clave del HashMap)
-        if (getElementos().containsKey(identificador)) {
-            resultados.add(getElementos().get(identificador));
+        Adoptantes resultado = retornarElemento(identificador);
+        if (resultado != null) {
+            System.out.println("Resultados: 1");
+            System.out.println("-----------------------------------");
+            System.out.println(resultado);
         } else {
-            // Buscar por nombre o correo
-            for (Adoptantes a : getElementos().values()) {
-                if (identificador.equalsIgnoreCase(a.getNombre())) {
-                    resultados.add(a);
-                }
-            }
+            System.out.println("Adoptante no encontrado");
         }
-        System.out.println("Resultados: "+ resultados.size());
-        System.out.println("-----------------------------------");       
-        resultados.forEach(System.out::println);        
     }     
 
     @Override
     public boolean eliminar(String identificador) {
-        Adoptantes adoptante= retornarElemento(identificador);
-        if (adoptante!=null){
-            getElementos().remove(String.valueOf(adoptante.getDni_persona()));
-            guardarCambios(); 
+        Adoptantes adoptante = retornarElemento(identificador);
+        if (adoptante != null) {
+            boolean eliminado = listaAdoptantes.eliminar(adoptante.getDni_persona());
+            if (eliminado) {
+                guardarCambios();
+                return true;
+            }
         }
-        return true;
+        return false;
+    }
+    
+    @Override
+    public Adoptantes retornarElemento(String identificador) {
+        // Intentar buscar por DNI
+        try {
+            int dni = Integer.parseInt(identificador);
+            return listaAdoptantes.buscarPorDNI(dni);
+        } catch (NumberFormatException e) {
+            // Buscar por nombre
+            return listaAdoptantes.buscarPorNombre(identificador);
+        }
+    }
+    
+    // ===== MÉTODOS PARA COMPATIBILIDAD CON EL RESTO DEL SISTEMA =====
+    
+    /**
+     * Obtiene todos los adoptantes como List para XML y BD
+     */
+    @Override
+    public List<Adoptantes> getElementos_listaporNombre() {
+        return listaAdoptantes.obtenerTodos();
+    }
+    
+    /**
+     * Obtiene la lista enlazada simple (para demostración)
+     */
+    public ListaEnlazadaSimple getListaAdoptantes() {
+        return listaAdoptantes;
     }
 }   
