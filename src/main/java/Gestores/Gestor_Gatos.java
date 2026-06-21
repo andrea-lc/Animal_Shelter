@@ -122,9 +122,7 @@ public class Gestor_Gatos extends GestorBase<Gatos> {
         System.out.println("Resultados: "+ resultados.size());
         System.out.println("-----------------------------------");
         resultados.forEach(System.out::println); 
-        }                         
-     
-    
+        }
     @Override
     // verificara si un gato existe >:( y si no piña
     public boolean existe(String identificador) {

@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package Gestores;
 
 import java.io.BufferedReader;
@@ -11,13 +7,12 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.Map;
-import java.util.Queue;
-import java.util.Stack;
 
 import Entidades.Administradores;
 import Entidades.Persona;
+import EstructurasDeDatos.Cola;
+import EstructurasDeDatos.Pila;
 
 /**
  *
@@ -39,8 +34,8 @@ public class Gestor_usuarios extends GestorBase<Administradores> {
     private static Gestor_usuarios instancia;
 
     // Pila para el historial de loggins
-    private Stack<Administradores> historialLogins = new Stack<>();
-    private Map<Administradores, Queue<Administradores>> intentosFallidosPorUsuario = new HashMap<>();
+    private Pila<Administradores> historialLogins = new Pila<>();
+    private final Map<Administradores, Cola> intentosFallidosPorUsuario = new HashMap<>();
 
     public Gestor_usuarios() {
         super("TXT/Administradores.txt");
@@ -95,19 +90,37 @@ public class Gestor_usuarios extends GestorBase<Administradores> {
     @Override
     public void guardarCambios() {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(rutaArchivo))) {
+
+            int cantidadAdmins = getElementos().size();
+            String[][] matrizAdmins = new String[cantidadAdmins][6];
+
+            // Llenar la matriz con los datos de cada administrador
+            int fila = 0;
             for (Administradores admin : getElementos().values()) {
-                String linea = String.format("%d,%s,%s,%d,%s,%s",
-                        admin.getDni_persona(),
-                        admin.getNombre(),
-                        admin.getApellido(),
-                        admin.getTelefono(),
-                        admin.getCorreo(),
-                        admin.getContraseña());
+                matrizAdmins[fila][0] = String.valueOf(admin.getDni_persona());
+                matrizAdmins[fila][1] = admin.getNombre();
+                matrizAdmins[fila][2] = admin.getApellido();
+                matrizAdmins[fila][3] = String.valueOf(admin.getTelefono());
+                matrizAdmins[fila][4] = admin.getCorreo();
+                matrizAdmins[fila][5] = admin.getContraseña();
+                fila++;
+            }
+
+            // Recorrer la matriz para escribir cada fila al archivo
+            for (int i = 0; i < matrizAdmins.length; i++) {
+                String linea = String.format("%s,%s,%s,%s,%s,%s",
+                        matrizAdmins[i][0],
+                        matrizAdmins[i][1],
+                        matrizAdmins[i][2],
+                        matrizAdmins[i][3],
+                        matrizAdmins[i][4],
+                        matrizAdmins[i][5]);
                 bw.write(linea);
                 bw.newLine();
             }
+
         } catch (IOException ex) {
-            System.out.println("Error al guardar cambios en el archivo de admiistradores");
+            System.out.println("Error al guardar cambios en el archivo de administradores");
         }
     }
 
@@ -123,7 +136,8 @@ public class Gestor_usuarios extends GestorBase<Administradores> {
         }
 
         Administradores valor = getElementos().get(correo); // devolvera el valor asociado a la clave "correo"
-
+        // verifica si el usuario esta bloqueadp, si la ora de desbloqueo esta
+        // configurada, y si la hora de desbloqueo ya paso
         if (valor.isBloqueado() && valor.getHoraDesbloqueo() != null
                 && LocalDateTime.now().isAfter(valor.getHoraDesbloqueo())) {
             valor.setBloqueado(false);
@@ -145,12 +159,15 @@ public class Gestor_usuarios extends GestorBase<Administradores> {
             System.out.println("Bienvenid@ " + valor.getNombre());
             valor.setFechaUltimoLogin(LocalDateTime.now()); // Actualizar la fecha del ultimo login exitoso
             historialLogins.push(valor);// Agrega a la pila el administrador que ha iniciado sesión exitosamente
-            intentosFallidosPorUsuario.get(valor).clear(); // Limpiar la cola de intentos fallidos al iniciar sesión exitosamente
+            if (intentosFallidosPorUsuario.containsKey(valor)) {
+                intentosFallidosPorUsuario.get(valor).clear(); // Limpiar la cola de intentos fallidos al iniciar sesión
+                                                               // exitosamente
+            }
             guardarHistorial(); // Guardar el historial de logins exitoso en el archivo
             return true; // login correcto
         } else {
             IntentosLoginFallidos(valor);
-            usuarioBloquados(valor);           
+            usuarioBloquados(valor);
             return false; // contraseña incorrecta
         }
     }
@@ -170,11 +187,11 @@ public class Gestor_usuarios extends GestorBase<Administradores> {
         LocalDateTime horabloqueada;
 
         // Verificar si el usuario ya tiene una cola de intentos fallidos
-        intentosFallidosPorUsuario.putIfAbsent(valor, new LinkedList<>());
+        intentosFallidosPorUsuario.putIfAbsent(valor, new Cola());
         // COLA
-        Queue<Administradores> intentosFallidos = intentosFallidosPorUsuario.get(valor);
+        Cola intentosFallidos = intentosFallidosPorUsuario.get(valor);
 
-        intentosFallidos.add(valor); // Agrega un intento fallido a la cola del usuario
+        intentosFallidos.enqueue(valor); // Agrega un intento fallido a la cola del usuario
 
         if (intentosFallidos.size() >= 2) { // Si el usuario ha tenido 2 intentos fallidos
             valor.setBloqueado(true); // Bloquea la cuenta del usuario
@@ -182,11 +199,10 @@ public class Gestor_usuarios extends GestorBase<Administradores> {
                     + " ha sido bloqueada debido a multiples intentos fallidos de inicio de sesion.");
             System.out.println("Pruebe denuevo en 5 minutos.");
             horabloqueada = LocalDateTime.now();
-            valor.setHoraDesbloqueo(horabloqueada.plusSeconds(20));          
+            valor.setHoraDesbloqueo(horabloqueada.plusSeconds(20));
         } else {
             return;
         }
-
     }
 
     private void usuarioBloquados(Administradores admin) {

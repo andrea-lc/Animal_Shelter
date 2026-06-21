@@ -44,8 +44,6 @@ public class POO_project {
                             menu.MainMenu();
                             break;
                         }else{
-                            
-                            System.out.println("Credenciales incorrectas");
                             System.out.print("Reintentar? (si/no): ");                          
                             if (lector.LeerString().equalsIgnoreCase("no")) {
                                 break;

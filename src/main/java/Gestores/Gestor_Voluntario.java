@@ -23,37 +23,36 @@ import java.util.function.Supplier;
  */
 public class Gestor_Voluntario extends GestorBase<Voluntarios> {
     private static Gestor_Voluntario instancia;
-    Lector lector=Lector.getInstanciaLector();
-            
-    
+    Lector lector = Lector.getInstanciaLector();
+
     public Gestor_Voluntario() {
         super("TXT/Voluntarios.txt");
     }
-    
-    public static Gestor_Voluntario getInstanciaAdoptante (){
-        if (instancia==null){
-            instancia=new Gestor_Voluntario();
+
+    public static Gestor_Voluntario getInstanciaAdoptante() {
+        if (instancia == null) {
+            instancia = new Gestor_Voluntario();
         }
         return instancia;
     }
-   
+
     @Override
     public void cargarDatos() {
         try (BufferedReader br = new BufferedReader(new FileReader(rutaArchivo))) {
             String linea;
             while ((linea = br.readLine()) != null) {
-                String[] datos = linea.split(",");              
+                String[] datos = linea.split(",");
                 if (datos.length == 6) {
                     int dni = Integer.parseInt(datos[0]);
                     String nombre = datos[1];
-                    String apellido= datos[2];
+                    String apellido = datos[2];
                     int telefono = Integer.parseInt(datos[3]);
                     String correo = datos[4];
                     String horarios_disponibles = datos[5];
-                    Voluntarios voluntario= new Voluntarios(new Persona(dni,nombre,apellido,telefono,correo)
-                            ,horarios_disponibles);
-                    
-                    getElementos().put((String.valueOf(dni)),voluntario);
+                    Voluntarios voluntario = new Voluntarios(new Persona(dni, nombre, apellido, telefono, correo),
+                            horarios_disponibles);
+
+                    getElementos().put((String.valueOf(dni)), voluntario);
                 }
             }
         } catch (IOException e) {
@@ -66,12 +65,12 @@ public class Gestor_Voluntario extends GestorBase<Voluntarios> {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(rutaArchivo))) {
             for (Voluntarios voluntario : getElementos().values()) {
                 String linea = String.format("%d,%s,%s,%d,%s,%s",
-                    voluntario.getDni_persona(),
-                    voluntario.getNombre(),
-                    voluntario.getApellido(),
-                    voluntario.getTelefono(),
-                    voluntario.getCorreo(),
-                    voluntario.getHorarios_disponibles());
+                        voluntario.getDni_persona(),
+                        voluntario.getNombre(),
+                        voluntario.getApellido(),
+                        voluntario.getTelefono(),
+                        voluntario.getCorreo(),
+                        voluntario.getHorarios_disponibles());
                 bw.write(linea);
                 bw.newLine();
             }
@@ -85,7 +84,7 @@ public class Gestor_Voluntario extends GestorBase<Voluntarios> {
         if (getElementos().containsKey(String.valueOf(voluntario.getDni_persona()))) {
             System.out.println("Este DNI ya esta registrado como voluntario.");
             return false;
-        }      
+        }
         getElementos().put((String.valueOf(voluntario.getDni_persona())), voluntario);
         guardarCambios();
         return true;
@@ -93,11 +92,11 @@ public class Gestor_Voluntario extends GestorBase<Voluntarios> {
 
     @Override
     public boolean existe(String identificador) {
-        boolean resultado=false;
-        Voluntarios voluntario= retornarElemento(identificador);       
-            if (voluntario!=null){
-                resultado=true;
-            }     
+        boolean resultado = false;
+        Voluntarios voluntario = retornarElemento(identificador);
+        if (voluntario != null) {
+            resultado = true;
+        }
         return resultado;
     }
 
@@ -106,35 +105,40 @@ public class Gestor_Voluntario extends GestorBase<Voluntarios> {
         if (getElementos().isEmpty()) {
             System.out.println("No hay voluntarios registrados en el sistema.");
             return;
-        }  
-        
+        }
+
         System.out.println("\n=== LISTA DE VOLUNTARIOS REGISTRADOS ===");
         System.out.println("Total de voluntarios: " + getElementos().size());
-        System.out.println("----------------------------------------");             
-        getElementos_listaporNombre().forEach(System.out::println);      
+        System.out.println("----------------------------------------");
+        getElementos_listaporNombre().forEach(System.out::println);
     }
 
     @Override
     public void modificar(String datoModificar, int opcion) {
         Voluntarios voluntario = retornarElemento(datoModificar);
 
-        Consumer <Voluntarios> [] modificador= new Consumer[4];
-        if (voluntario != null){
-            modificador[1]= (v) ->{ System.out.print("Nuevo telefono: "); 
-                                    v.setTelefono(lector.LeerEntero());};
-            modificador[2]= (v)->{ System.out.print("Nuevo correo: ");
-                                    v.setCorreo(lector.LeerString());};      
-            modificador[3]= (v) ->{System.out.print("Nuevo horario: ");                                    
-                                    v.setHorarios_disponibles(gestionHorario(lector.LeerEntero()));
-                                    };
+        Consumer<Voluntarios>[] modificador = new Consumer[4];
+        if (voluntario != null) {
+            modificador[1] = (v) -> {
+                System.out.print("Nuevo telefono: ");
+                v.setTelefono(lector.LeerEntero());
+            };
+            modificador[2] = (v) -> {
+                System.out.print("Nuevo correo: ");
+                v.setCorreo(lector.LeerString());
+            };
+            modificador[3] = (v) -> {
+                System.out.print("Nuevo horario: ");
+                v.setHorarios_disponibles(gestionHorario(lector.LeerEntero()));
+            };
         }
-        modificador[opcion].accept(voluntario);      
+        modificador[opcion].accept(voluntario);
         guardarCambios();
     }
 
     @Override
-    public void buscar(String identificador) {        
-        List<Voluntarios> resultados= new ArrayList <>();
+    public void buscar(String identificador) {
+        List<Voluntarios> resultados = new ArrayList<>();
         // Buscar por DNI (clave del HashMap)
         if (getElementos().containsKey(identificador)) {
             resultados.add(getElementos().get(identificador));
@@ -146,38 +150,49 @@ public class Gestor_Voluntario extends GestorBase<Voluntarios> {
                 }
             }
         }
-        System.out.println("Resultados: "+ resultados.size());
+        System.out.println("Resultados: " + resultados.size());
         System.out.println("-----------------------------------");
-        resultados.forEach(System.out::println);      
-    } 
-    
-        @Override
+        resultados.forEach(System.out::println);
+    }
+
+    @Override
     public boolean eliminar(String identificador) {
-        Voluntarios voluntario= retornarElemento(identificador);
-        if (voluntario!=null){
+        Voluntarios voluntario = retornarElemento(identificador);
+        if (voluntario != null) {
             getElementos().remove(String.valueOf(voluntario.getDni_persona()));
             guardarCambios();
         }
         return true;
     }
-    
-    public static String gestionHorario(int opcion){  
-        String [] horarios={"Lunes (Diurno): 9:00 - 11:00", 
-                            "Miércoles (Diurno): 10:00 - 12:00",
-                            "Viernes (Diurno): 8:00 - 10:00",
-                            "Martes (Tarde): 13:00 - 15:00",
-                            "Jueves (Tarde): 15:00 - 17:00", 
-                            "Sábado (Tarde): 16:00 - 18:00" };
-        Supplier<String>[] HorarioEscogido= new Supplier[6];  
-        HorarioEscogido[0]= ()->{return horarios[0];};
-        HorarioEscogido[1]= ()->{return horarios[1];};
-        HorarioEscogido[2]= ()->{return horarios[2];};
-        HorarioEscogido[3]= ()->{return horarios[3];};
-        HorarioEscogido[4]= ()->{return horarios[4];};
-        HorarioEscogido[5]= ()->{return horarios[5];};
-             
-        return HorarioEscogido[opcion-1].get();
-    } 
 
+    public static String gestionHorario(int opcion) {
+        String[] horarios = { "Lunes (Diurno): 9:00 - 11:00",
+                "Miércoles (Diurno): 10:00 - 12:00",
+                "Viernes (Diurno): 8:00 - 10:00",
+                "Martes (Tarde): 13:00 - 15:00",
+                "Jueves (Tarde): 15:00 - 17:00",
+                "Sábado (Tarde): 16:00 - 18:00" };
+        Supplier<String>[] HorarioEscogido = new Supplier[6];
+        HorarioEscogido[0] = () -> {
+            return horarios[0];
+        };
+        HorarioEscogido[1] = () -> {
+            return horarios[1];
+        };
+        HorarioEscogido[2] = () -> {
+            return horarios[2];
+        };
+        HorarioEscogido[3] = () -> {
+            return horarios[3];
+        };
+        HorarioEscogido[4] = () -> {
+            return horarios[4];
+        };
+        HorarioEscogido[5] = () -> {
+            return horarios[5];
+        };
+
+        return HorarioEscogido[opcion - 1].get();
+    }
 
 }

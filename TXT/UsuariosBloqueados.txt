@@ -20,3 +20,24 @@ DNI #60783559
   Correo: andreadelr.lc@gmail.com 
   Ultimo Login: 14/06/2026 20:18:46
   Usuario Bloqueado: Usuario Bloqueado 
+
+DNI #60783559
+  Nombre y Apellido: Andrea Lopez
+  Telefono: 946414833
+  Correo: andreadelr.lc@gmail.com 
+  Ultimo Login: 21/06/2026 00:13:05
+  Usuario Bloqueado: El usuario no esta bloqueado 
+
+DNI #60783559
+  Nombre y Apellido: Andrea Lopez
+  Telefono: 946414833
+  Correo: andreadelr.lc@gmail.com 
+  Ultimo Login: 21/06/2026 00:13:05
+  Usuario Bloqueado: Usuario Bloqueado 
+
+DNI #60783559
+  Nombre y Apellido: Andrea Lopez
+  Telefono: 946414833
+  Correo: andreadelr.lc@gmail.com 
+  Ultimo Login: 21/06/2026 00:13:05
+  Usuario Bloqueado: El usuario no esta bloqueado 
