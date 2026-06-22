@@ -5,7 +5,6 @@
 package Menus;
 
 import Entidades.Gatos;
-import Gestores.GestorInterface;
 import Gestores.Gestor_Gatos;
 import Scanner.Lector;
 
@@ -15,7 +14,7 @@ import Scanner.Lector;
  */
 public class Acciones_gatos implements Menu_Acciones  {
     Lector lector=Lector.getInstanciaLector();
-    GestorInterface<Gatos> gestor= Gestor_Gatos.getInstanciaGatos();
+    Gestor_Gatos gestor= Gestor_Gatos.getInstanciaGatos();
     
     @Override  
     public void registrar() {
