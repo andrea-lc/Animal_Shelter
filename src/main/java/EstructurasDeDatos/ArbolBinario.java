@@ -11,10 +11,10 @@ public class ArbolBinario {
 
     // Recorrido en Preorden (Raíz, Izquierdo, Derecho)
     public void preorden(Nodo nodo) {
-        if (nodo != null) {
-            System.out.print(nodo.dato + " ");
-            preorden(nodo.izquierdo);
-            preorden(nodo.derecho);
+        if(nodo!=null){
+            System.out.println(nodo.dato + " ");
+            preorden(raiz.izquierdo);
+            preorden(raiz.derecho);
         }
     }
 

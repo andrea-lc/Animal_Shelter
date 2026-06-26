@@ -13,6 +13,7 @@ import Entidades.Administradores;
 import Entidades.Persona;
 import EstructurasDeDatos.Cola;
 import EstructurasDeDatos.Pila;
+import Scanner.Lector;
 
 /**
  *
@@ -32,10 +33,15 @@ public class Gestor_usuarios extends GestorBase<Administradores> {
      */
 
     private static Gestor_usuarios instancia;
+    Lector lector= Lector.getInstanciaLector();
 
     // Pila para el historial de loggins
-    private Pila<Administradores> historialLogins = new Pila<>();
+    private Pila historialLogins = new Pila();
+    private Pila historialLoginsEstatico= new Pila(5);
     private final Map<Administradores, Cola> intentosFallidosPorUsuario = new HashMap<>();
+    private final Map<Administradores, Cola> intentosFallidosPorUsuarioDinamico = new HashMap<>();
+    String tipoPila;
+    String tipoCola;
 
     public Gestor_usuarios() {
         super("TXT/Administradores.txt");
@@ -123,6 +129,18 @@ public class Gestor_usuarios extends GestorBase<Administradores> {
             System.out.println("Error al guardar cambios en el archivo de administradores");
         }
     }
+    public void TipoEstructuraUsada(){
+        System.out.println("Pilas:");
+        System.out.println("1) Dinamicas");
+        System.out.println("2) Estaticas");
+        System.out.print("Opcion: ");
+        this.tipoPila= lector.LeerString();
+        System.out.println("Colas:");
+        System.out.println("1) Dinamicas");
+        System.out.println("2) Estaticas");
+        System.out.print("Opcion: ");
+        this.tipoCola= lector.LeerString();
+    }
 
     public boolean login(String correo, String contraseña) {
         // Verificar si existe algun correo en el sistema
@@ -147,6 +165,9 @@ public class Gestor_usuarios extends GestorBase<Administradores> {
             if (intentosFallidosPorUsuario.containsKey(valor)) {
                 intentosFallidosPorUsuario.get(valor).clear();
             }
+            if (intentosFallidosPorUsuarioDinamico.containsKey(valor)) {
+                intentosFallidosPorUsuarioDinamico.get(valor).clear();
+            }
             System.out.println("La cuenta de " + valor.getNombre() + " ha sido desbloqueada.");
         }
 
@@ -158,11 +179,18 @@ public class Gestor_usuarios extends GestorBase<Administradores> {
         if (valor != null && valor.getContraseña().equals(contraseña)) {
             System.out.println("Bienvenid@ " + valor.getNombre());
             valor.setFechaUltimoLogin(LocalDateTime.now()); // Actualizar la fecha del ultimo login exitoso
-            historialLogins.push(valor);// Agrega a la pila el administrador que ha iniciado sesión exitosamente
-            if (intentosFallidosPorUsuario.containsKey(valor)) {
-                intentosFallidosPorUsuario.get(valor).clear(); // Limpiar la cola de intentos fallidos al iniciar sesión
-                                                               // exitosamente
+            if (tipoPila.equalsIgnoreCase("1")) {
+                historialLogins.push(valor);// Agrega a la pila el administrador que ha iniciado sesión exitosamente
+            }else if (tipoPila.equalsIgnoreCase("2")) {
+                historialLoginsEstatico.pushEstatico(valor);
             }
+
+            if (tipoCola.equalsIgnoreCase("1")) {
+                intentosFallidosPorUsuarioDinamico.get(valor).clear();
+            }else if (tipoCola.equalsIgnoreCase("2")) {
+                intentosFallidosPorUsuario.get(valor).clear(); // Limpiar la cola de intentos fallidos al iniciar sesión
+            }
+
             guardarHistorial(); // Guardar el historial de logins exitoso en el archivo
             return true; // login correcto
         } else {
@@ -175,34 +203,65 @@ public class Gestor_usuarios extends GestorBase<Administradores> {
     // Metodo para guardar el historial de logins exitosos en un archivo de texto
     // (PILAS)
     private void guardarHistorial() {
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter("TXT/HistorialLogins.txt", true))) {
-            bw.write(historialLogins.peek().toString()); // escribe en el archivo el ultimo elemento en la pila
-            bw.newLine();
-        } catch (IOException ex) {
-            System.out.println("Error al guardar cambios en el archivo de historial de logins");
-        }
+        if (tipoPila.equalsIgnoreCase("1")) {
+                try (BufferedWriter bw = new BufferedWriter(new FileWriter("TXT/HistorialLogins.txt", true))) {
+                    bw.write(historialLogins.peek().toString()); // escribe en el archivo el ultimo elemento en la pila
+                    bw.newLine();
+                } catch (IOException ex) {
+                    System.out.println("Error al guardar cambios en el archivo de historial de logins");
+                }
+            }else if (tipoPila.equalsIgnoreCase("2")) {
+                try (BufferedWriter bw = new BufferedWriter(new FileWriter("TXT/HistorialLoginsEstatico.txt", true))) {
+                    bw.write(historialLoginsEstatico.peekEstatico().toString()); // escribe en el archivo el ultimo elemento en la pila
+                    bw.newLine();
+                } catch (IOException ex) {
+                    System.out.println("Error al guardar cambios en el archivo de historial de logins");
+                }
+            }
     }
 
     private void IntentosLoginFallidos(Administradores valor) {
         LocalDateTime horabloqueada;
 
-        // Verificar si el usuario ya tiene una cola de intentos fallidos
-        intentosFallidosPorUsuario.putIfAbsent(valor, new Cola());
-        // COLA
-        Cola intentosFallidos = intentosFallidosPorUsuario.get(valor);
+        if (tipoCola.equalsIgnoreCase("1")) {
+                            // Verificar si el usuario ya tiene una cola de intentos fallidos
+                intentosFallidosPorUsuarioDinamico.putIfAbsent(valor, new Cola());
+                // COLA
+                Cola intentosFallidos = intentosFallidosPorUsuario.get(valor);
+        
+                intentosFallidos.enqueueDinamico(valor); // Agrega un intento fallido a la cola del usuario
+        
+                if (intentosFallidos.sizeDinamico() >= 2) { // Si el usuario ha tenido 2 intentos fallidos
+                    valor.setBloqueado(true); // Bloquea la cuenta del usuario
+                    System.out.println("La cuenta de " + valor.getNombre()
+                            + " ha sido bloqueada debido a multiples intentos fallidos de inicio de sesion.");
+                    System.out.println("Pruebe denuevo en 5 minutos.");
+                    horabloqueada = LocalDateTime.now();
+                    valor.setHoraDesbloqueo(horabloqueada.plusSeconds(20));
+                } else {
+                    return;
+                }
 
-        intentosFallidos.enqueue(valor); // Agrega un intento fallido a la cola del usuario
+            }else if (tipoCola.equalsIgnoreCase("2")) {
+                // Verificar si el usuario ya tiene una cola de intentos fallidos
+                intentosFallidosPorUsuario.putIfAbsent(valor, new Cola());
+                // COLA
+                Cola intentosFallidos = intentosFallidosPorUsuario.get(valor);
+        
+                intentosFallidos.enqueue(valor); // Agrega un intento fallido a la cola del usuario
+        
+                if (intentosFallidos.size() >= 2) { // Si el usuario ha tenido 2 intentos fallidos
+                    valor.setBloqueado(true); // Bloquea la cuenta del usuario
+                    System.out.println("La cuenta de " + valor.getNombre()
+                            + " ha sido bloqueada debido a multiples intentos fallidos de inicio de sesion.");
+                    System.out.println("Pruebe denuevo en 5 minutos.");
+                    horabloqueada = LocalDateTime.now();
+                    valor.setHoraDesbloqueo(horabloqueada.plusSeconds(20));
+                } else {
+                    return;
+                }
+            }
 
-        if (intentosFallidos.size() >= 2) { // Si el usuario ha tenido 2 intentos fallidos
-            valor.setBloqueado(true); // Bloquea la cuenta del usuario
-            System.out.println("La cuenta de " + valor.getNombre()
-                    + " ha sido bloqueada debido a multiples intentos fallidos de inicio de sesion.");
-            System.out.println("Pruebe denuevo en 5 minutos.");
-            horabloqueada = LocalDateTime.now();
-            valor.setHoraDesbloqueo(horabloqueada.plusSeconds(20));
-        } else {
-            return;
-        }
     }
 
     private void usuarioBloquados(Administradores admin) {

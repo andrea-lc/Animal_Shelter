@@ -9,12 +9,21 @@ public class Cola {
     int tamanio;
     int capacidad;
 
+    // --- Para la Cola Dinámica (nuevos) ---
+    private Nodo<Administradores> frenteDinamico; // Apunta al primer elemento en entrar
+    private Nodo<Administradores> finDinamico;    // Apunta al último elemento en entrar
+    private int tamanioDinamico; 
+
     public Cola() {
         this.capacidad = 5;
         this.datos = new Administradores[capacidad]; // ← Aquí se crea el arreglo
         this.frente = 0;
         this.fin = -1;
         this.tamanio = 0;
+//Dinamico 
+        this.frenteDinamico = null;
+        this.finDinamico = null;
+        this.tamanioDinamico = 0;
     }
 
     public void enqueue(Administradores valor) {
@@ -44,5 +53,39 @@ public class Cola {
         frente = 0;
         fin = -1;
         tamanio = 0;
+    }
+
+    //metodos para cola dinamica
+       // Enqueue Dinámico: Agregar un elemento al final de la cola
+    public void enqueueDinamico(Administradores valor) {
+        Nodo<Administradores> nuevo = new Nodo<>(valor);
+        
+        if (estaVaciaDinamica()) {
+            // Si está vacía, tanto el frente como el fin apuntan al nuevo nodo
+            frenteDinamico = nuevo;
+            finDinamico = nuevo;
+        } else {
+            // Si no está vacía, el nodo actual del final apunta al nuevo, y el nuevo pasa a ser el fin
+            finDinamico.siguiente = nuevo;
+            finDinamico = nuevo;
+        }
+        tamanioDinamico++;
+    }
+
+    // Método auxiliar para saber si la cola dinámica está vacía
+    public boolean estaVaciaDinamica() {
+        return tamanioDinamico == 0;
+    }
+
+    // Método auxiliar para obtener el tamaño de la cola dinámica
+    public int sizeDinamico() {
+        return tamanioDinamico;
+    }
+
+    // Método para vaciar la cola dinámica
+    public void clearDinamico() {
+        frenteDinamico = null;
+        finDinamico = null;
+        tamanioDinamico = 0;
     }
 }
