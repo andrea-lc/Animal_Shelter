@@ -7,13 +7,13 @@ package Gestores;
 import Entidades.Persona;
 import Entidades.Voluntarios;
 import EstructurasDeDatos.ListaCircular;
+import EstructurasDeDatos.ListaDobleEnlazada;
 import Scanner.Lector;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -28,13 +28,13 @@ public class Gestor_Voluntario extends GestorBase<Voluntarios> {
     //ListaCircular (para búsqueda e inserción)
     private ListaCircular listaVoluntarios;
     
-    // LinkedList (doble enlazada) (para eliminación y recorrido)
-    private LinkedList<Voluntarios> listaDoble;
+    // ListaDobleEnlazada propia (para eliminación y recorrido)
+    private ListaDobleEnlazada<Voluntarios> listaDoble;
     
      public Gestor_Voluntario() {
         super("TXT/Voluntarios.txt");
         this.listaVoluntarios = new ListaCircular();
-        this.listaDoble = new LinkedList<>(); 
+        this.listaDoble = new ListaDobleEnlazada<>(); 
         cargarDatos();
     }
     
@@ -48,7 +48,7 @@ public class Gestor_Voluntario extends GestorBase<Voluntarios> {
     @Override
     public void cargarDatos() {
         if (listaDoble == null) {
-            listaDoble = new LinkedList<>();
+            listaDoble = new ListaDobleEnlazada<>();
         }
         if (listaVoluntarios == null) {
             listaVoluntarios = new ListaCircular();
@@ -87,12 +87,12 @@ public class Gestor_Voluntario extends GestorBase<Voluntarios> {
     }
     
     /**
-     * Método auxiliar para insertar ordenado en LinkedList (doble enlazada)
+     * Método auxiliar para insertar ordenado en la ListaDobleEnlazada propia
      */
     private void insertarOrdenadoEnDoble(Voluntarios voluntario) {
         // Verificar que listaDoble no sea null
         if (listaDoble == null) {
-            listaDoble = new LinkedList<>();
+            listaDoble = new ListaDobleEnlazada<>();
         }
         
         int posicion = 0;
@@ -252,7 +252,7 @@ public class Gestor_Voluntario extends GestorBase<Voluntarios> {
     public void mostrarDobleDesdeFinal() {
         // Verificar que listaDoble no sea null
         if (listaDoble == null) {
-            listaDoble = new LinkedList<>();
+            listaDoble = new ListaDobleEnlazada<>();
         }
         
         if (listaDoble.isEmpty()) {
@@ -307,9 +307,9 @@ public class Gestor_Voluntario extends GestorBase<Voluntarios> {
         return listaVoluntarios;
     }
     
-    public LinkedList<Voluntarios> getListaDoble() {
+    public ListaDobleEnlazada<Voluntarios> getListaDoble() {
         if (listaDoble == null) {
-            listaDoble = new LinkedList<>();
+            listaDoble = new ListaDobleEnlazada<>();
         }
         return listaDoble;
     }
