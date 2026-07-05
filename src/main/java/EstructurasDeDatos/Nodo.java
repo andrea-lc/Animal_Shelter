@@ -20,6 +20,24 @@ import java.util.List;
  * Dejar los atributos que no se usan en null/vacíos no genera ningún
  * problema ni gasta memoria relevante, y evita duplicar la misma clase
  * Nodo una y otra vez en cada archivo.
+ *
+ *
+ * Nodo utilizado por la Lista Circular.
+ *
+ * Cada nodo almacena un objeto Voluntarios y una referencia al siguiente
+ * nodo de la lista.
+ *
+ * La diferencia con una lista simplemente enlazada es que el último nodo
+ * nunca apunta a null, sino nuevamente al primer nodo, formando un ciclo
+ * cerrado que permite recorrer todos los elementos de manera continua.
+ *
+ * Nodo utilizado por la Lista Enlazada Simple.
+ *
+ * Cada nodo almacena un objeto Adoptantes y una referencia al siguiente
+ * nodo de la lista.
+ *
+ * El último nodo siempre apunta a null, indicando que no existen más
+ * elementos después de él.
  */
 
 public class Nodo<T> {

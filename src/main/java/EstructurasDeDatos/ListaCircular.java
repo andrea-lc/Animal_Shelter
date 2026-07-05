@@ -1,9 +1,31 @@
-
 package EstructurasDeDatos;
+
 import Entidades.Voluntarios;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Implementación de una Lista Circular para almacenar los voluntarios del
+ * sistema.
+ *
+ * En una lista circular el último nodo no apunta a null, sino que vuelve a
+ * apuntar al primer nodo (cabeza), formando un ciclo continuo. Gracias a
+ * esta característica es posible recorrer la estructura indefinidamente y
+ * realizar rotaciones de manera muy eficiente sin mover los datos.
+ *
+ * En este proyecto la lista circular se utiliza para administrar los
+ * voluntarios, permitiendo:
+ * - Registrar voluntarios de forma ordenada.
+ * - Buscar rápidamente por DNI o nombre.
+ * - Eliminar registros.
+ * - Recorrer todos los voluntarios.
+ * - Rotar la lista para cambiar automáticamente el voluntario inicial,
+ *   simulando la rotación de turnos de atención.
+ *
+ * La principal ventaja de esta estructura es que permite implementar
+ * fácilmente sistemas de asignación por turnos o recorridos cíclicos,
+ * donde después del último elemento siempre se vuelve al primero.
+ */
 public class ListaCircular {
     public static class Nodo {
         public Voluntarios voluntario;

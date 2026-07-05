@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package Gestores;
 
 import Entidades.Persona;
@@ -17,8 +13,33 @@ import java.io.IOException;
 import java.util.List;
 
 /**
+ * Gestor encargado de administrar todos los voluntarios registrados en el
+ * sistema.
  *
- * @author admin
+ * Esta clase utiliza dos estructuras de datos que trabajan de manera
+ * sincronizada:
+ *
+ * - Lista Circular:
+ *   Se utiliza como estructura principal para registrar, buscar,
+ *   recorrer y rotar los voluntarios, aprovechando que el último nodo
+ *   vuelve al primero para simular la rotación de turnos.
+ *
+ * - Lista Doble Enlazada:
+ *   Se mantiene sincronizada con la lista circular y permite realizar
+ *   recorridos desde el final hacia el inicio, además de facilitar las
+ *   operaciones de eliminación y navegación en ambos sentidos.
+ *
+ * También es responsable de:
+ * - Cargar los datos desde el archivo.
+ * - Registrar voluntarios.
+ * - Buscar por nombre o DNI.
+ * - Modificar información.
+ * - Eliminar registros.
+ * - Guardar automáticamente los cambios.
+ * - Mantener sincronizadas ambas estructuras después de cada operación.
+ *
+ * De esta manera se aprovechan las ventajas particulares de cada estructura
+ * de datos dentro del proyecto.
  */
 public class Gestor_Voluntario extends GestorBase<Voluntarios> {
         

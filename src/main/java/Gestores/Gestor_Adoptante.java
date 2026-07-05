@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package Gestores;
 
 import Entidades.Adoptantes;
@@ -16,8 +12,24 @@ import java.io.IOException;
 import java.util.List;
 
 /**
+ * Gestor encargado de administrar todos los adoptantes registrados en el
+ * sistema.
  *
- * @author admin
+ * Esta clase implementa la lógica de negocio relacionada con los
+ * adoptantes, utilizando una Lista Enlazada Simple como estructura de
+ * almacenamiento principal en memoria.
+ *
+ * Además de gestionar la estructura de datos, también es responsable de:
+ * - Cargar los datos desde el archivo de texto.
+ * - Registrar nuevos adoptantes.
+ * - Buscar por DNI o nombre.
+ * - Modificar información.
+ * - Eliminar registros.
+ * - Guardar automáticamente los cambios realizados.
+ *
+ * Gracias a esta separación, la estructura de datos únicamente almacena
+ * información, mientras que el gestor se encarga de toda la lógica del
+ * sistema y la persistencia de los datos.
  */
 
 public class Gestor_Adoptante extends GestorBase<Adoptantes>{

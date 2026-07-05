@@ -3,7 +3,29 @@ package EstructurasDeDatos;
 
 import Entidades.Adoptantes;
 
-
+/**
+ * Implementación de una Lista Enlazada Simple para almacenar los adoptantes
+ * registrados en el sistema.
+ *
+ * Una lista simplemente enlazada está formada por nodos donde cada uno
+ * conoce únicamente al siguiente nodo. El último elemento apunta a null,
+ * indicando el final de la estructura.
+ *
+ * En este proyecto esta estructura reemplaza al uso de HashMap para poder
+ * demostrar el funcionamiento de una estructura de datos lineal creada
+ * manualmente.
+ *
+ * Permite realizar operaciones como:
+ * - Registrar adoptantes.
+ * - Insertar registros de forma ordenada.
+ * - Buscar por DNI o nombre.
+ * - Eliminar registros.
+ * - Recorrer todos los elementos desde el primero hasta el último.
+ *
+ * Su principal ventaja es su simplicidad y el bajo consumo de memoria, ya
+ * que cada nodo únicamente mantiene una referencia hacia el siguiente
+ * elemento.
+ */
 public class ListaEnlazadaSimple {
     
     // Clase Nodo interna
