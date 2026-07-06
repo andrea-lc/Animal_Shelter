@@ -6,52 +6,36 @@ import java.util.List;
 
 /**
  * Nodo genérico reutilizable para las distintas estructuras de datos del
- * proyecto (Pila, Cola, ArbolBinario, ListaDobleEnlazada, etc).
+ * proyecto (Pila, Cola, Árbol Binario, Lista Enlazada Simple,
+ * Lista Circular y Lista Doble Enlazada).
  *
- * En vez de que cada estructura declare su propia clase interna de nodo,
- * todas comparten esta clase y solo usan los atributos que necesitan:
- *  - Pila / Cola (hacia adelante): usan "siguiente".
- *  - ListaDobleEnlazada: además usa "anterior" para poder recorrer el
- *    nodo hacia atrás (esa es la diferencia clave frente a una lista
- *    simplemente enlazada).
- *  - ArbolBinario: usa "izquierdo" y "derecho".
- *  - Estructuras de árboles N-arios (si las hubiera): usan "hijos".
+ * En lugar de que cada estructura declare su propia clase Nodo, todas
+ * reutilizan esta clase genérica y emplean únicamente los atributos que
+ * necesitan.
  *
- * Dejar los atributos que no se usan en null/vacíos no genera ningún
- * problema ni gasta memoria relevante, y evita duplicar la misma clase
- * Nodo una y otra vez en cada archivo.
+ * Según la estructura utilizada:
+ * - Pila y Cola: utilizan "dato" y "siguiente".
+ * - Lista Enlazada Simple: utiliza "dato" y "siguiente".
+ * - Lista Circular: utiliza "dato" y "siguiente", haciendo que el último
+ *   nodo vuelva a apuntar al primero.
+ * - Lista Doble Enlazada: utiliza "dato", "siguiente" y "anterior".
+ * - Árbol Binario: utiliza "dato", "izquierdo" y "derecho".
+ * - Árboles N-arios: utilizan "dato" y la lista "hijos".
  *
+ * Los atributos que una estructura no necesita permanecen en null o vacíos,
+ * lo que evita duplicar código y permite reutilizar una única clase Nodo
+ * en todo el proyecto.
  *
- * Nodo utilizado por la Lista Circular.
- *
- * Cada nodo almacena un objeto Voluntarios y una referencia al siguiente
- * nodo de la lista.
- *
- * La diferencia con una lista simplemente enlazada es que el último nodo
- * nunca apunta a null, sino nuevamente al primer nodo, formando un ciclo
- * cerrado que permite recorrer todos los elementos de manera continua.
- *
- * Nodo utilizado por la Lista Enlazada Simple.
- *
- * Cada nodo almacena un objeto Adoptantes y una referencia al siguiente
- * nodo de la lista.
- *
- * El último nodo siempre apunta a null, indicando que no existen más
- * elementos después de él.
+ * @param <T> Tipo de dato almacenado en el nodo.
  */
-
 public class Nodo<T> {
-    /** Valor / dato real que guarda el nodo. */
+    /** Dato almacenado por el nodo. */
     public T dato;
 
-    /** Puntero al siguiente nodo (listas, pilas, colas). */
+    /** Referencia al siguiente nodo (listas, pilas y colas). */
     public Nodo<T> siguiente;
 
-    /**
-     * Puntero al nodo anterior. Solo lo utiliza la ListaDobleEnlazada;
-     * en el resto de estructuras (Pila, Cola, ListaCircular, etc.)
-     * simplemente se queda en null.
-     */
+    /** Referencia al nodo anterior (solo utilizada por la lista doblemente enlazada). */
     public Nodo<T> anterior;
     
     // Atributos para uso de Arboles
@@ -62,6 +46,7 @@ public class Nodo<T> {
     public Nodo(T dato) {
         this.dato = dato;
         this.siguiente = null;
+        this.anterior = null;
         this.izquierdo = null;
         this.derecho = null;
         this.hijos = new ArrayList<>();

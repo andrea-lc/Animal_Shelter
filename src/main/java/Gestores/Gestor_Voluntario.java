@@ -4,6 +4,7 @@ import Entidades.Persona;
 import Entidades.Voluntarios;
 import EstructurasDeDatos.ListaCircular;
 import EstructurasDeDatos.ListaDobleEnlazada;
+import EstructurasDeDatos.Nodo;
 import Scanner.Lector;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -347,14 +348,14 @@ public class Gestor_Voluntario extends GestorBase<Voluntarios> {
 
         // 1. Rotar la lista circular
         listaVoluntarios.rotar();//La cabeza cambia
-        String nuevaCabeza = listaVoluntarios.getCabeza().voluntario.getNombre();
+        String nuevaCabeza = listaVoluntarios.getCabeza().dato.getNombre();
 
         // 2. SINCRONIZAR: Reconstruir la lista doble desde la circular
         listaDoble.clear();
 
-        ListaCircular.Nodo actual = listaVoluntarios.getCabeza();
+        Nodo<Voluntarios> actual = listaVoluntarios.getCabeza();
         do {
-            listaDoble.add(actual.voluntario);
+            listaDoble.add(actual.dato);
             actual = actual.siguiente;
         } while (actual != listaVoluntarios.getCabeza());
 
