@@ -5,16 +5,23 @@
 package Entidades;
 
 /**
+ * Clase que representa a los adoptantes del sistema Cat Haven.
+ * Hereda de Persona y agrega información sobre el gato que ha sido adoptado.
  *
  * @author admin
  */
 public class Adoptantes extends Persona {
+
+    // Nombre del gato que ha sido adoptado por esta persona
     private String gato_Adoptado;
-    
+
+    // Constructor que recibe una Persona existente y el nombre del gato adoptado
     public Adoptantes(Persona persona, String gato_Adoptado) {
-        super (persona);
+        super(persona);
         this.gato_Adoptado = gato_Adoptado;
     }
+
+    // ===== GETTERS Y SETTERS =====
 
     public String getGato_Adoptado() {
         return gato_Adoptado;
@@ -24,8 +31,12 @@ public class Adoptantes extends Persona {
         this.gato_Adoptado = gato_Adoptado;
     }
 
+    // ===== MÉTODOS AUXILIARES =====
+
+    // Representación en texto del adoptante, incluye los datos de Persona
+    // más el nombre del gato adoptado
     @Override
     public String toString() {
-        return super.toString()+ "  Gato_Adoptado: "+ gato_Adoptado;
-    } 
+        return super.toString() + "  Gato_Adoptado: " + gato_Adoptado;
+    }
 }

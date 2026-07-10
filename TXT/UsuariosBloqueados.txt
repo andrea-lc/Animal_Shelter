@@ -41,3 +41,31 @@ DNI #60783559
   Correo: andreadelr.lc@gmail.com 
   Ultimo Login: 21/06/2026 00:13:05
   Usuario Bloqueado: El usuario no esta bloqueado 
+
+DNI #60793552
+  Nombre y Apellido: Andrea Lopez
+  Telefono: 93040344
+  Correo: andreadelr.lc@gmail.com 
+  Ultimo Login: 09/07/2026 22:47:15
+  Usuario Bloqueado: El usuario no esta bloqueado 
+
+DNI #60305492
+  Nombre y Apellido: Bryan Guardia
+  Telefono: 920404344
+  Correo: admin 
+  Ultimo Login: Sin registro
+  Usuario Bloqueado: El usuario no esta bloqueado 
+
+DNI #60305492
+  Nombre y Apellido: Bryan Guardia
+  Telefono: 920404344
+  Correo: admin 
+  Ultimo Login: Sin registro
+  Usuario Bloqueado: Usuario Bloqueado 
+
+DNI #60305492
+  Nombre y Apellido: Bryan Guardia
+  Telefono: 920404344
+  Correo: admin 
+  Ultimo Login: Sin registro
+  Usuario Bloqueado: El usuario no esta bloqueado 

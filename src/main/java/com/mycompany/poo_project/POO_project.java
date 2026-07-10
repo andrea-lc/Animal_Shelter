@@ -22,7 +22,10 @@ public class POO_project {
         // Instancia del gestor de usuarios (encargado de manejar login y registro)
         Gestor_usuarios usuarios = Gestor_usuarios.getInstanciaUsuario();
         Menu menu = new Menu();
+        
         int opcion;
+
+        usuarios.TipoEstructuraUsada();
 
         do {
             System.out.println("\n========== Cat Haven ==========");

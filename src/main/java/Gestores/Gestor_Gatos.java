@@ -5,6 +5,7 @@
 package Gestores;
 
 import Entidades.Gatos;
+import EstructurasDeDatos.ArbolBinario;
 import EstructurasDeDatos.Nodo;
 import Scanner.Lector;
 import java.io.BufferedReader;
@@ -28,10 +29,11 @@ import java.util.function.Consumer;
  * para eso aplico singleton, para tener solo una instancia
  */
 public class Gestor_Gatos extends GestorBase<Gatos> {
-    Lector lector = Lector.getInstanciaLector();
-    private static Gestor_Gatos instancia;
-    private Nodo<Gatos> raiz;
 
+    Lector lector = Lector.getInstanciaLector();
+    private static Gestor_Gatos instancia; 
+    private ArbolBinario arbol; 
+    
     private Gestor_Gatos() {
         super("TXT/gatos.txt");
     }
@@ -43,11 +45,18 @@ public class Gestor_Gatos extends GestorBase<Gatos> {
     // entonces vuelve a retornar la misma instancia
     public static Gestor_Gatos getInstanciaGatos() {
         if (instancia == null) {
-            instancia = new Gestor_Gatos();
+            instancia = new Gestor_Gatos();           
         }
         return instancia;
     }
-
+    // ✅ MÉTODO GETTER con lazy initialization
+    private ArbolBinario getArbol() {
+        if (arbol == null) {
+            arbol = new ArbolBinario();
+        }
+        return arbol;
+    }
+    
     @Override
     public void cargarDatos() {
         try (BufferedReader br = new BufferedReader(new FileReader(rutaArchivo))) {
@@ -64,11 +73,12 @@ public class Gestor_Gatos extends GestorBase<Gatos> {
                     String esterilizacion = datos[6];
                     String estado_gato = datos[7];
                     String cuidado_requerido = datos[8];
-                    Gatos gato = new Gatos(id, nombre, edad, raza, peso, genero, esterilizacion, estado_gato,
-                            cuidado_requerido);
+
+                    Gatos gato = new Gatos(id, nombre, edad, raza, peso, genero,
+                            esterilizacion, estado_gato, cuidado_requerido);
 
                     getElementos().put(String.valueOf(gato.getId()), gato);
-                    InsertarenArbol(gato);
+                    getArbol().insertar(gato); // ✅ Delegamos al árbol
                 }
             }
         } catch (IOException e) {
@@ -100,27 +110,16 @@ public class Gestor_Gatos extends GestorBase<Gatos> {
 
     @Override
     public boolean registrar(Gatos gatos) {
-        if (getElementos().containsKey(String.valueOf(gatos.getId()))) { // verifica si el map contiene la clave
+        if (getElementos().containsKey(String.valueOf(gatos.getId()))) {
             System.out.println("ID duplicada! ingrese otro");
             return true;
         }
-
         getElementos().put(String.valueOf(gatos.getId()), gatos);
         guardarCambios();
-        InsertarenArbol(gatos);
+        getArbol().insertar(gatos); // ✅ Delegamos al árbol
         return true;
     }
 
-    public void InsertarenArbol(Gatos nuevoGato) {
-        // Creamos el nodo internamente
-        Nodo<Gatos> nuevoNodo = new Nodo<>(nuevoGato);
-
-        if (raiz == null) {
-            raiz = nuevoNodo; // Si está vacío, es la raíz
-        } else {
-            insertarRecursivo(raiz, nuevoNodo); // Si no, buscamos su lugar
-        }
-    }
 
     // decide si va a la izquierda o derecha
     private void insertarRecursivo(Nodo<Gatos> actual, Nodo<Gatos> nuevo) {
@@ -143,66 +142,30 @@ public class Gestor_Gatos extends GestorBase<Gatos> {
 
     @Override
     public void buscar(String identificador) {
-        List<Gatos> resultados = new ArrayList<>();
-        // Si la raíz es null, el árbol está vacío y no se puede buscar
-        if (raiz == null) {
-        System.out.println("El árbol está vacío. No se puede buscar.");
-        return;
-    }
+        if (getArbol().estaVacio()) {
+            System.out.println("El árbol está vacío. No se puede buscar.");
+            return;
+        }
 
-        // Intentar buscar por ID (Aprovechando la eficiencia del BST)
+        // Intentar buscar por ID (aprovechando la eficiencia del BST)
         try {
             int idBuscado = Integer.parseInt(identificador);
-            Nodo<Gatos> encontrado = buscarPorID(raiz, idBuscado);
+            Gatos encontrado = getArbol().buscarPorID(idBuscado); // ✅ Delegamos al árbol
             if (encontrado != null) {
-                resultados.add(encontrado.dato);
+                System.out.println("Resultados: 1");
+                System.out.println("-----------------------------------");
+                System.out.println(encontrado);
+                return;
             }
         } catch (NumberFormatException e) {
-            // Si el identificador no es un número (ej. un nombre),
-            // simplemente ignoramos la búsqueda por ID y pasamos al nombre.
+            // No es un número, pasamos a buscar por nombre
         }
 
-        // Si no se encontró por ID, buscar por nombre recorriendo TODO el árbol
-        if (resultados.isEmpty()) {
-            buscarPorNombre(raiz, identificador, resultados);
-        }
-
+        // Si no se encontró por ID, buscar por nombre
+        List<Gatos> resultados = getArbol().buscarPorNombre(identificador); // ✅ Delegamos al árbol
         System.out.println("Resultados: " + resultados.size());
         System.out.println("-----------------------------------");
         resultados.forEach(System.out::println);
-    }
-
-    private Nodo<Gatos> buscarPorID(Nodo<Gatos> nodo, int idBuscado) {
-        if (nodo == null) {
-            return null; // No existe o llegamos a una hoja sin encontrarlo
-        }
-
-        if (nodo.dato.getId() == idBuscado) {
-            return nodo; // Encontramos el gato con el ID buscado
-        } else if (idBuscado < nodo.dato.getId()) {
-            // Si el ID buscado es MENOR, según la teoría del BST, va a la IZQUIERDA
-            return buscarPorID(nodo.izquierdo, idBuscado);
-        } else {
-            // Si el ID buscado es MAYOR, va a la DERECHA
-            return buscarPorID(nodo.derecho, idBuscado);
-        }
-    }
-
-    private void buscarPorNombre(Nodo<Gatos> nodo, String nombreBuscado, List<Gatos> resultados) {
-        if (nodo == null) {
-            return; // Llegamos al final de una rama (una hoja)
-        }
-
-        // 1. Revisar el nodo actual (Raíz)
-        if (nodo.dato.getNombre().equalsIgnoreCase(nombreBuscado)) {
-            resultados.add(nodo.dato);
-        }
-
-        // 2. Recorrer subárbol izquierdo
-        buscarPorNombre(nodo.izquierdo, nombreBuscado, resultados);
-
-        // 3. Recorrer subárbol derecho
-        buscarPorNombre(nodo.derecho, nombreBuscado, resultados);
     }
 
     @Override
@@ -225,8 +188,7 @@ public class Gestor_Gatos extends GestorBase<Gatos> {
         }
         System.out.println("\n=== LISTA DE GATOS REGISTRADOS ===");
         System.out.println("Total de gatos: " + getElementos().size());
-        System.out.println("-----------------------------------");
-        getElementos_listaporId().forEach(System.out::println);
+        getArbol().imprimirPreorden();
     }
 
     // opciones que tenia, usar put() o usar replace()
@@ -298,8 +260,9 @@ public class Gestor_Gatos extends GestorBase<Gatos> {
         }
         List<Gatos> Gatos_enAdopcion = new ArrayList<>();
         for (Gatos gato : getElementos_listaporId()) {
-            if (gato.getEstado_gato().equalsIgnoreCase("En adopcion"))
+            if (gato.getEstado_gato().equalsIgnoreCase("En adopcion")) {
                 Gatos_enAdopcion.add(gato);
+            }
         }
 
         System.out.println("\n=== LISTA DE GATOS EN ADOPCION ===");

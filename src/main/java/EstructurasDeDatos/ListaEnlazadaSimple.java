@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package EstructurasDeDatos;
 
 import Entidades.Adoptantes;
@@ -12,18 +8,7 @@ import Entidades.Adoptantes;
  */
 public class ListaEnlazadaSimple {
     
-    // Clase Nodo interna
-    public static class Nodo {
-        public Adoptantes adoptante;
-        public Nodo siguiente;
-        
-        public Nodo(Adoptantes adoptante) {
-            this.adoptante = adoptante;
-            this.siguiente = null;
-        }
-    }
-    
-    private Nodo cabeza;
+    private Nodo<Adoptantes> cabeza;
     private int tamaño;
     
     public ListaEnlazadaSimple() {
@@ -35,11 +20,11 @@ public class ListaEnlazadaSimple {
     
     // Insertar al final (O(n))
     public void insertarAlFinal(Adoptantes adoptante) {
-        Nodo nuevo = new Nodo(adoptante);
+        Nodo<Adoptantes> nuevo = new Nodo<>(adoptante);
         if (cabeza == null) {
             cabeza = nuevo;
         } else {
-            Nodo actual = cabeza;
+            Nodo<Adoptantes> actual = cabeza;
             while (actual.siguiente != null) {
                 actual = actual.siguiente;
             }
@@ -50,16 +35,16 @@ public class ListaEnlazadaSimple {
     
     // Insertar ordenado por nombre (O(n))
     public void insertarOrdenado(Adoptantes adoptante) {
-        Nodo nuevo = new Nodo(adoptante);
+        Nodo<Adoptantes> nuevo = new Nodo<>(adoptante);
         
         if (cabeza == null || 
-            adoptante.getNombre().compareTo(cabeza.adoptante.getNombre()) < 0) {
+            adoptante.getNombre().compareTo(cabeza.dato.getNombre()) < 0) {
             nuevo.siguiente = cabeza;
             cabeza = nuevo;
         } else {
-            Nodo actual = cabeza;
+            Nodo<Adoptantes> actual = cabeza;
             while (actual.siguiente != null && 
-                   adoptante.getNombre().compareTo(actual.siguiente.adoptante.getNombre()) > 0) {
+                   adoptante.getNombre().compareTo(actual.siguiente.dato.getNombre()) > 0) {
                 actual = actual.siguiente;
             }
             nuevo.siguiente = actual.siguiente;
@@ -70,10 +55,10 @@ public class ListaEnlazadaSimple {
     
     // Buscar por DNI (O(n))
     public Adoptantes buscarPorDNI(int dni) {
-        Nodo actual = cabeza;
+        Nodo<Adoptantes> actual = cabeza;
         while (actual != null) {
-            if (actual.adoptante.getDni_persona() == dni) {
-                return actual.adoptante;
+            if (actual.dato.getDni_persona() == dni) {
+                return actual.dato;
             }
             actual = actual.siguiente;
         }
@@ -82,10 +67,10 @@ public class ListaEnlazadaSimple {
     
     // Buscar por nombre (O(n))
     public Adoptantes buscarPorNombre(String nombre) {
-        Nodo actual = cabeza;
+        Nodo<Adoptantes> actual = cabeza;
         while (actual != null) {
-            if (actual.adoptante.getNombre().equalsIgnoreCase(nombre)) {
-                return actual.adoptante;
+            if (actual.dato.getNombre().equalsIgnoreCase(nombre)) {
+                return actual.dato;
             }
             actual = actual.siguiente;
         }
@@ -97,15 +82,15 @@ public class ListaEnlazadaSimple {
         if (cabeza == null) return false;
         
         // Si es la cabeza
-        if (cabeza.adoptante.getDni_persona() == dni) {
+        if (cabeza.dato.getDni_persona() == dni) {
             cabeza = cabeza.siguiente;
             tamaño--;
             return true;
         }
         
-        Nodo actual = cabeza;
+        Nodo<Adoptantes> actual = cabeza;
         while (actual.siguiente != null && 
-               actual.siguiente.adoptante.getDni_persona() != dni) {
+               actual.siguiente.dato.getDni_persona() != dni) {
             actual = actual.siguiente;
         }
         
@@ -128,31 +113,31 @@ public class ListaEnlazadaSimple {
         System.out.println("Total: " + tamaño + " adoptantes");
         System.out.println("-----------------------------------");
         
-        Nodo actual = cabeza;
+        Nodo<Adoptantes> actual = cabeza;
         int pos = 1;
         while (actual != null) {
-            System.out.println(pos++ + ". " + actual.adoptante.getNombre() +
-                             " (DNI: " + actual.adoptante.getDni_persona() + 
-                             ") -> Gato: " + actual.adoptante.getGato_Adoptado());
-            actual = actual.siguiente;//Avanza al siguiente
+            System.out.println(pos++ + ". " + actual.dato.getNombre() +
+                             " (DNI: " + actual.dato.getDni_persona() + 
+                             ") -> Gato: " + actual.dato.getGato_Adoptado());
+            actual = actual.siguiente; // Avanza al siguiente
         }
         System.out.println("-----------------------------------");
-        System.out.println("null (fin de la lista)"); //EVIDENCIA: El último apunta a null
+        System.out.println("null (fin de la lista)"); // EVIDENCIA: El último apunta a null
     }
     
     // Obtener todos los elementos como lista (para XML/BD)
     public java.util.List<Adoptantes> obtenerTodos() {
         java.util.List<Adoptantes> lista = new java.util.ArrayList<>();
-        Nodo actual = cabeza;
+        Nodo<Adoptantes> actual = cabeza;
         while (actual != null) {
-            lista.add(actual.adoptante);
+            lista.add(actual.dato);
             actual = actual.siguiente;
         }
         return lista;
     }
     
     // Getters
-    public Nodo getCabeza() { return cabeza; }
+    public Nodo<Adoptantes> getCabeza() { return cabeza; }
     public int getTamaño() { return tamaño; }
     public boolean estaVacia() { return cabeza == null; }
 }

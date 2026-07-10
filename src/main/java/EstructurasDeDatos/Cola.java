@@ -56,6 +56,7 @@ public class Cola {
     }
 
     //metodos para cola dinamica
+    
        // Enqueue Dinámico: Agregar un elemento al final de la cola
     public void enqueueDinamico(Administradores valor) {
         Nodo<Administradores> nuevo = new Nodo<>(valor);
