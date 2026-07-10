@@ -1,24 +1,46 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package Gestores;
 
 import Entidades.Persona;
 import Entidades.Voluntarios;
 import EstructurasDeDatos.ListaCircular;
+import EstructurasDeDatos.ListaDobleEnlazada;
+import EstructurasDeDatos.Nodo;
 import Scanner.Lector;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.LinkedList;
 import java.util.List;
 
 /**
+ * Gestor encargado de administrar todos los voluntarios registrados en el
+ * sistema.
  *
- * @author admin
+ * Esta clase utiliza dos estructuras de datos que trabajan de manera
+ * sincronizada:
+ *
+ * - Lista Circular:
+ *   Se utiliza como estructura principal para registrar, buscar,
+ *   recorrer y rotar los voluntarios, aprovechando que el último nodo
+ *   vuelve al primero para simular la rotación de turnos.
+ *
+ * - Lista Doble Enlazada:
+ *   Se mantiene sincronizada con la lista circular y permite realizar
+ *   recorridos desde el final hacia el inicio, además de facilitar las
+ *   operaciones de eliminación y navegación en ambos sentidos.
+ *
+ * También es responsable de:
+ * - Cargar los datos desde el archivo.
+ * - Registrar voluntarios.
+ * - Buscar por nombre o DNI.
+ * - Modificar información.
+ * - Eliminar registros.
+ * - Guardar automáticamente los cambios.
+ * - Mantener sincronizadas ambas estructuras después de cada operación.
+ *
+ * De esta manera se aprovechan las ventajas particulares de cada estructura
+ * de datos dentro del proyecto.
  */
 public class Gestor_Voluntario extends GestorBase<Voluntarios> {
         
@@ -28,13 +50,13 @@ public class Gestor_Voluntario extends GestorBase<Voluntarios> {
     //ListaCircular (para búsqueda e inserción)
     private ListaCircular listaVoluntarios;
     
-    // LinkedList (doble enlazada) (para eliminación y recorrido)
-    private LinkedList<Voluntarios> listaDoble;
+    // ListaDobleEnlazada propia (para eliminación y recorrido)
+    private ListaDobleEnlazada<Voluntarios> listaDoble;
     
      public Gestor_Voluntario() {
         super("TXT/Voluntarios.txt");
         this.listaVoluntarios = new ListaCircular();
-        this.listaDoble = new LinkedList<>(); 
+        this.listaDoble = new ListaDobleEnlazada<>(); 
         cargarDatos();
     }
     
@@ -48,7 +70,7 @@ public class Gestor_Voluntario extends GestorBase<Voluntarios> {
     @Override
     public void cargarDatos() {
         if (listaDoble == null) {
-            listaDoble = new LinkedList<>();
+            listaDoble = new ListaDobleEnlazada<>();
         }
         if (listaVoluntarios == null) {
             listaVoluntarios = new ListaCircular();
@@ -87,12 +109,12 @@ public class Gestor_Voluntario extends GestorBase<Voluntarios> {
     }
     
     /**
-     * Método auxiliar para insertar ordenado en LinkedList (doble enlazada)
+     * Método auxiliar para insertar ordenado en la ListaDobleEnlazada propia
      */
     private void insertarOrdenadoEnDoble(Voluntarios voluntario) {
         // Verificar que listaDoble no sea null
         if (listaDoble == null) {
-            listaDoble = new LinkedList<>();
+            listaDoble = new ListaDobleEnlazada<>();
         }
         
         int posicion = 0;
@@ -252,7 +274,7 @@ public class Gestor_Voluntario extends GestorBase<Voluntarios> {
     public void mostrarDobleDesdeFinal() {
         // Verificar que listaDoble no sea null
         if (listaDoble == null) {
-            listaDoble = new LinkedList<>();
+            listaDoble = new ListaDobleEnlazada<>();
         }
         
         if (listaDoble.isEmpty()) {
@@ -307,9 +329,9 @@ public class Gestor_Voluntario extends GestorBase<Voluntarios> {
         return listaVoluntarios;
     }
     
-    public LinkedList<Voluntarios> getListaDoble() {
+    public ListaDobleEnlazada<Voluntarios> getListaDoble() {
         if (listaDoble == null) {
-            listaDoble = new LinkedList<>();
+            listaDoble = new ListaDobleEnlazada<>();
         }
         return listaDoble;
     }
@@ -326,14 +348,14 @@ public class Gestor_Voluntario extends GestorBase<Voluntarios> {
 
         // 1. Rotar la lista circular
         listaVoluntarios.rotar();//La cabeza cambia
-        String nuevaCabeza = listaVoluntarios.getCabeza().voluntario.getNombre();
+        String nuevaCabeza = listaVoluntarios.getCabeza().dato.getNombre();
 
         // 2. SINCRONIZAR: Reconstruir la lista doble desde la circular
         listaDoble.clear();
 
-        ListaCircular.Nodo actual = listaVoluntarios.getCabeza();
+        Nodo<Voluntarios> actual = listaVoluntarios.getCabeza();
         do {
-            listaDoble.add(actual.voluntario);
+            listaDoble.add(actual.dato);
             actual = actual.siguiente;
         } while (actual != listaVoluntarios.getCabeza());
 

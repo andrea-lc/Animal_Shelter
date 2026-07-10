@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package Gestores;
 
 import Entidades.Adoptantes;
@@ -16,17 +12,38 @@ import java.io.IOException;
 import java.util.List;
 
 /**
+ * Gestor encargado de administrar todos los adoptantes registrados en el
+ * sistema.
  *
- * @author admin
+ * Esta clase implementa la lógica de negocio relacionada con los
+ * adoptantes, utilizando una Lista Enlazada Simple como estructura de
+ * almacenamiento principal en memoria.
+ *
+ * Además de gestionar la estructura de datos, también es responsable de:
+ * - Cargar los datos desde el archivo de texto.
+ * - Registrar nuevos adoptantes.
+ * - Buscar por DNI o nombre.
+ * - Modificar información.
+ * - Eliminar registros.
+ * - Guardar automáticamente los cambios realizados.
+ *
+ * Gracias a esta separación, la estructura de datos únicamente almacena
+ * información, mientras que el gestor se encarga de toda la lógica del
+ * sistema y la persistencia de los datos.
  */
 
 public class Gestor_Adoptante extends GestorBase<Adoptantes>{
-     Lector lector = Lector.getInstanciaLector();
+    /** Instancia única del lector de datos. */
+    Lector lector = Lector.getInstanciaLector();
+    /** Instancia Singleton del gestor. */
     private static Gestor_Adoptante instancia;
-    
-    //CAMBIO: Ahora usa ListaEnlazadaSimple en lugar de HashMap
+    /** Lista enlazada simple utilizada para almacenar los adoptantes. */
     private ListaEnlazadaSimple listaAdoptantes;
-
+    
+    /**
+    * Crea el gestor de adoptantes, inicializa la lista enlazada
+    * y carga los datos almacenados en el archivo.
+    */
     public Gestor_Adoptante() {
         super("TXT/Adoptantes.txt");
         this.listaAdoptantes = new ListaEnlazadaSimple();
@@ -39,10 +56,15 @@ public class Gestor_Adoptante extends GestorBase<Adoptantes>{
         }
         return instancia;
     }
-
+        
+    /**
+    * Carga todos los adoptantes desde el archivo de texto e
+    * inserta los registros en la lista enlazada simple de
+    * forma ordenada por nombre.
+    */
     @Override
     public void cargarDatos() {
-        // Limpiar la lista
+        // Reinicia la lista antes de cargar nuevamente los datos.
         listaAdoptantes = new ListaEnlazadaSimple();
         
         try (BufferedReader br = new BufferedReader(new FileReader(rutaArchivo))) {
@@ -70,7 +92,11 @@ public class Gestor_Adoptante extends GestorBase<Adoptantes>{
             System.out.println("No se pudo cargar adoptantes (puede que el archivo este vacio)");
         }
     }
-
+    
+    /**
+    * Guarda todos los adoptantes almacenados en la lista
+    * enlazada dentro del archivo de texto.
+    */
     @Override
     public void guardarCambios() {
         try (BufferedWriter bw = new BufferedWriter(new FileWriter(rutaArchivo))) {
@@ -94,7 +120,11 @@ public class Gestor_Adoptante extends GestorBase<Adoptantes>{
             System.out.println("Error al guardar cambios en el archivo de adoptantes");
         }
     }
-
+    
+    /**
+    * Registra un nuevo adoptante verificando previamente
+    * que el DNI no exista en la lista.
+    */
     @Override
     public boolean registrar(Adoptantes adoptante) { 
         // Verificar si ya existe por DNI
@@ -113,13 +143,21 @@ public class Gestor_Adoptante extends GestorBase<Adoptantes>{
     public boolean existe(String identificador) {
         return retornarElemento(identificador) != null;
     }
-
+    
+    /**
+    * Muestra todos los adoptantes registrados recorriendo
+    * la lista enlazada simple.
+    */
     @Override
     public void mostrar() {
 
         listaAdoptantes.mostrar();
     }
-
+    
+    /**
+    * Modifica el teléfono o correo electrónico de un
+    * adoptante previamente registrado.
+    */
     @Override
     public void modificar(String datoModificar, int opcion) {
         Adoptantes adoptante = retornarElemento(datoModificar);
@@ -145,7 +183,11 @@ public class Gestor_Adoptante extends GestorBase<Adoptantes>{
         guardarCambios();
         System.out.println("Datos modificados exitosamente");
     }
-        
+    
+    /**
+    * Busca un adoptante por DNI o nombre y muestra
+    * la información encontrada.
+    */
     @Override
     public void buscar(String identificador) {
         Adoptantes resultado = retornarElemento(identificador);
@@ -157,7 +199,11 @@ public class Gestor_Adoptante extends GestorBase<Adoptantes>{
             System.out.println("Adoptante no encontrado");
         }
     }     
-
+    
+    /**
+    * Elimina un adoptante de la lista enlazada utilizando
+    * su DNI como identificador.
+    */
     @Override
     public boolean eliminar(String identificador) {
         Adoptantes adoptante = retornarElemento(identificador);
@@ -171,6 +217,10 @@ public class Gestor_Adoptante extends GestorBase<Adoptantes>{
         return false;
     }
     
+    /**
+    * Busca un adoptante utilizando como identificador
+    * el DNI o el nombre.
+    */
     @Override
     public Adoptantes retornarElemento(String identificador) {
         // Intentar buscar por DNI
@@ -183,7 +233,9 @@ public class Gestor_Adoptante extends GestorBase<Adoptantes>{
         }
     }
     
-    // ===== MÉTODOS PARA COMPATIBILIDAD CON EL RESTO DEL SISTEMA =====
+    // ============================================================
+    // MÉTODOS UTILITARIOS
+    // ============================================================
     
     /**
      * Obtiene todos los adoptantes como List para XML y BD

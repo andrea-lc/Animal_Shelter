@@ -1,31 +1,43 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package EstructurasDeDatos;
+
 import Entidades.Voluntarios;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * Implementación de una Lista Circular para almacenar los voluntarios del
+ * sistema.
  *
- * @author USER
+ * En una lista circular el último nodo no apunta a null, sino que vuelve a
+ * apuntar al primer nodo (cabeza), formando un ciclo continuo. Gracias a
+ * esta característica es posible recorrer la estructura indefinidamente y
+ * realizar rotaciones de manera muy eficiente sin mover los datos.
+ *
+ * En este proyecto la lista circular se utiliza para administrar los
+ * voluntarios, permitiendo:
+ * - Registrar voluntarios de forma ordenada.
+ * - Buscar rápidamente por DNI o nombre.
+ * - Eliminar registros.
+ * - Recorrer todos los voluntarios.
+ * - Rotar la lista para cambiar automáticamente el voluntario inicial,
+ *   simulando la rotación de turnos de atención.
+ *
+ * La principal ventaja de esta estructura es que permite implementar
+ * fácilmente sistemas de asignación por turnos o recorridos cíclicos,
+ * donde después del último elemento siempre se vuelve al primero.
  */
 public class ListaCircular {
-    public static class Nodo {
-        public Voluntarios voluntario;
-        public Nodo siguiente;
-        
-        public Nodo(Voluntarios voluntario) {
-            this.voluntario = voluntario;
-            this.siguiente = null;
-        }
-    }
     
-    private Nodo cabeza;
-    private Nodo cola;
+    /** Primer nodo de la lista circular. */    
+    private Nodo<Voluntarios> cabeza;
+    /** Último nodo de la lista circular. */
+    private Nodo<Voluntarios> cola;
+    /** Cantidad de voluntarios almacenados. */
     private int tamaño;
     
+    /**
+    * Crea una lista circular vacía.
+    */
     public ListaCircular() {
         this.cabeza = null;
         this.cola = null;
@@ -34,8 +46,13 @@ public class ListaCircular {
     
     // ===== OPERACIONES DE INSERCIÓN =====
     
+    /**
+    * Inserta un voluntario al final de la lista.
+    * Complejidad: O(1), ya que se mantiene una referencia
+    * directa al último nodo (cola).
+    */
     public void insertarAlFinal(Voluntarios voluntario) {
-        Nodo nuevo = new Nodo(voluntario);
+        Nodo<Voluntarios> nuevo = new Nodo<>(voluntario);
         
         if (cabeza == null) {
             cabeza = nuevo;
@@ -49,8 +66,13 @@ public class ListaCircular {
         tamaño++;
     }
     
+    /**
+    * Inserta un voluntario manteniendo el orden alfabético
+    * por nombre.
+    * Complejidad: O(n).
+    */
     public void insertarOrdenado(Voluntarios voluntario) {
-        Nodo nuevo = new Nodo(voluntario);
+        Nodo<Voluntarios> nuevo = new Nodo<>(voluntario);
         
         if (cabeza == null) {
             cabeza = nuevo;
@@ -60,8 +82,8 @@ public class ListaCircular {
             return;
         }
         
-        // Si debe ir al inicio
-        if (voluntario.getNombre().compareTo(cabeza.voluntario.getNombre()) < 0) {
+        // Si el nuevo voluntario debe convertirse en la cabeza de la lista.
+        if (voluntario.getNombre().compareTo(cabeza.dato.getNombre()) < 0) {
             nuevo.siguiente = cabeza;
             cola.siguiente = nuevo;
             cabeza = nuevo;
@@ -69,9 +91,9 @@ public class ListaCircular {
             return;
         }
         
-        Nodo actual = cabeza;
+        Nodo<Voluntarios> actual = cabeza;
         while (actual != cola && 
-               voluntario.getNombre().compareTo(actual.siguiente.voluntario.getNombre()) > 0) {
+               voluntario.getNombre().compareTo(actual.siguiente.dato.getNombre()) > 0) {
             actual = actual.siguiente;
         }
         
@@ -86,13 +108,17 @@ public class ListaCircular {
     
     // ===== OPERACIONES DE BÚSQUEDA =====
     
+    /**
+    * Busca un voluntario por su DNI.
+    * Complejidad: O(n).
+    */
     public Voluntarios buscarPorDNI(int dni) {
         if (cabeza == null) return null;
         
-        Nodo actual = cabeza;
+        Nodo<Voluntarios> actual = cabeza;
         do {
-            if (actual.voluntario.getDni_persona() == dni) {
-                return actual.voluntario;
+            if (actual.dato.getDni_persona() == dni) {
+                return actual.dato;
             }
             actual = actual.siguiente;
         } while (actual != cabeza);
@@ -100,13 +126,17 @@ public class ListaCircular {
         return null;
     }
     
+    /**
+    * Busca un voluntario por su nombre.
+    * Complejidad: O(n).
+    */
     public Voluntarios buscarPorNombre(String nombre) {
         if (cabeza == null) return null;
         
-        Nodo actual = cabeza;
+        Nodo<Voluntarios> actual = cabeza;
         do {
-            if (actual.voluntario.getNombre().equalsIgnoreCase(nombre)) {
-                return actual.voluntario;
+            if (actual.dato.getNombre().equalsIgnoreCase(nombre)) {
+                return actual.dato;
             }
             actual = actual.siguiente;
         } while (actual != cabeza);
@@ -129,14 +159,19 @@ public class ListaCircular {
     
     // ===== OPERACIONES DE ELIMINACIÓN =====
     
+    /**
+    * Elimina un voluntario utilizando su DNI.
+    * Complejidad: O(n).
+    */
     public boolean eliminar(int dni) {
         if (cabeza == null) return false;
         
-        Nodo actual = cabeza;
-        Nodo anterior = cola; // El anterior al inicio es la cola
+        Nodo<Voluntarios> actual = cabeza;
+        // En una lista circular, el nodo anterior a la cabeza siempre es la cola.
+        Nodo<Voluntarios> anterior = cola;
         
         do {
-            if (actual.voluntario.getDni_persona() == dni) {
+            if (actual.dato.getDni_persona() == dni) {
                 // Si es el único elemento
                 if (tamaño == 1) {
                     cabeza = null;
@@ -162,6 +197,13 @@ public class ListaCircular {
     
     // ===== OPERACIONES DE VISUALIZACIÓN =====
     
+    /**
+    * Recorre la lista circular mostrando todos los
+    * voluntarios registrados.
+    * El recorrido finaliza cuando se vuelve nuevamente
+    * al nodo cabeza.
+    * Complejidad: O(n).
+    */
     public void mostrar() {
         if (cabeza == null) {
             System.out.println("Lista circular vacía");
@@ -173,46 +215,60 @@ public class ListaCircular {
         System.out.println("El último apunta al primero (forma un ciclo)");
         System.out.println("-----------------------------------");
         
-        Nodo actual = cabeza;
+        Nodo<Voluntarios> actual = cabeza;
         int pos = 1;
         do {
-            System.out.println(pos++ + ". " + actual.voluntario.getNombre() +
-                             " (DNI: " + actual.voluntario.getDni_persona() + 
-                             ") -> Horario: " + actual.voluntario.getHorarios_disponibles());
+            System.out.println(pos++ + ". " + actual.dato.getNombre() +
+                             " (DNI: " + actual.dato.getDni_persona() + 
+                             ") -> Horario: " + actual.dato.getHorarios_disponibles());
             actual = actual.siguiente;
         } while (actual != cabeza);
         System.out.println("-----------------------------------");
-        System.out.println("Vuelve al inicio: " + cabeza.voluntario.getNombre());
+        System.out.println("Vuelve al inicio: " + cabeza.dato.getNombre());
     }
     
     // ===== MÉTODOS UTILITARIOS =====
     
+    /**
+    * Devuelve todos los voluntarios en una List.
+    * Se utiliza para guardar datos en archivos
+    * o recorrer la colección mediante foreach.
+    * Complejidad: O(n).
+    */
     public List<Voluntarios> obtenerTodos() {
         List<Voluntarios> lista = new ArrayList<>();
         if (cabeza == null) return lista;
         
-        Nodo actual = cabeza;
+        Nodo<Voluntarios> actual = cabeza;
         do {
-            lista.add(actual.voluntario);
+            lista.add(actual.dato);
             actual = actual.siguiente;
         } while (actual != cabeza);
         
         return lista;
     }
     
+    // ============================================================
+    // MÉTODOS UTILITARIOS
+    // ============================================================
+
+    /** @return Cantidad de voluntarios registrados. */
     public int getTamaño() {
         return tamaño;
     }
     
+    /** @return true si la lista está vacía. */
     public boolean estaVacia() {
         return cabeza == null;
     }
     
-    public Nodo getCabeza() {
+    /** @return Primer nodo de la lista circular. */
+    public Nodo<Voluntarios> getCabeza() {
         return cabeza;
     }
     
-    public Nodo getCola() {
+    /** @return Último nodo de la lista circular. */
+    public Nodo<Voluntarios> getCola() {
         return cola;
     }
 }
