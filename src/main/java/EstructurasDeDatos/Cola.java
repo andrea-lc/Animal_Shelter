@@ -10,17 +10,18 @@ public class Cola {
     int capacidad;
 
     // --- Para la Cola Dinámica (nuevos) ---
-    private Nodo<Administradores> frenteDinamico; // Apunta al primer elemento en entrar
-    private Nodo<Administradores> finDinamico;    // Apunta al último elemento en entrar
+    private Nodo<Administradores> frenteDinamico; 
+    private Nodo<Administradores> finDinamico;   
     private int tamanioDinamico; 
 
     public Cola() {
+        //estatico
         this.capacidad = 5;
-        this.datos = new Administradores[capacidad]; // ← Aquí se crea el arreglo
+        this.datos = new Administradores[capacidad]; //
         this.frente = 0;
         this.fin = -1;
         this.tamanio = 0;
-//Dinamico 
+        //Dinamico 
         this.frenteDinamico = null;
         this.finDinamico = null;
         this.tamanioDinamico = 0;

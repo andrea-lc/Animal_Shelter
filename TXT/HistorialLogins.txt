@@ -47,3 +47,9 @@ DNI #60305492
   Telefono: 920404344
   Correo: admin 
   Ultimo Login: 10/07/2026 11:53:32
+
+DNI #60305492
+  Nombre y Apellido: Bryan Guardia
+  Telefono: 920404344
+  Correo: admin 
+  Ultimo Login: 10/07/2026 12:55:45
